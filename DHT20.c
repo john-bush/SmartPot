@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "i2c.h"
 
-#define SENSOR_ADDRESS 0x5C // I2C address of the sensor
+#define SENSOR_ADDRESS 0x38 // I2C address of the sensor from manufacturer
 
 void sensor_send_command(uint8_t command) {
     i2c_start();
