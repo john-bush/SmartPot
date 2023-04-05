@@ -1,3 +1,4 @@
+#include "tft_display_lib.h"
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 #include <SPI.h>
@@ -6,12 +7,6 @@
   #define TFT_CS         14
   #define TFT_RST        15
   #define TFT_DC         32
-
-#elif defined(ESP8266)
-  #define TFT_CS         4
-  #define TFT_RST        16
-  #define TFT_DC         5
-
 #else
   // For the breakout board, you can use any 2 or 3 pins.
   // These pins will also work for the 1.8" TFT shield.
