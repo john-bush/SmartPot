@@ -425,6 +425,13 @@ void BarChart () {
   }
 }
 
+void ReadSoil(){
+  int soil_read = analogRead(PC0);
+  MoveTo(xsize/2, ysize/2);
+  delay(1000);
+  PlotInt(soil_read);
+}
+
 void Waterfall () {
   int x0 = 0, y0 = 0, w = xsize, h = ysize, x1 = 15, y1 = 11;
   int factor = 5160/h*10;

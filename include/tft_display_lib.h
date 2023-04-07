@@ -48,4 +48,5 @@ void PlotInt(int n);
 void TestChart ();
 void BarChart ();
 void Waterfall ();
+void ReadSoil();
 

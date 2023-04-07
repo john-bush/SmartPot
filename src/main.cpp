@@ -7,15 +7,19 @@ void setup(void) {
   ClearDisplay();
   DisplayOn();
   MoveTo(0,0);
+
+  DDRC &= ~(0<<PC0);
   // TestChart();
 }
 
 void loop() {
-  BarChart();
+  //BarChart();
   delay(2000);
   ClearDisplay();
-  Waterfall();
-  for (;;);
+  //Waterfall();
+  for (;;){
+    ReadSoil();
+  };
   
   
   // tft.invertDisplay(true);
