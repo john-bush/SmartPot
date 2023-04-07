@@ -114,7 +114,6 @@ void TFTDisplay::DrawImage(const uint16_t *image, int w, int h, int centerX, int
   for(int y=0; y<h; y++) {
     for(int x=0; x<w; x++) {
       fore = pgm_read_word(&image[y*w+x]);
-      // fore = static_cast<int>(image[y*w+x]);
       PlotPoint(imageOriginX + x, imageOriginY - y);
     }
   }
@@ -171,7 +170,7 @@ void TFTDisplay::FillRect (int w, int h) {
 }
 
 void TFTDisplay::FillRect (int w, int h, int x, int y) {
-  MoveTo(x, y);
+  xpos = x; ypos = y;
   FillRect(w, h);
 }
 
@@ -185,7 +184,7 @@ void TFTDisplay::DrawRect (int w, int h) {
 }
 
 void TFTDisplay::DrawRect (int w, int h, int x, int y) {
-  MoveTo(x, y);
+  xpos = x; ypos = y;
   DrawRect(w, h);
 }
 
@@ -210,7 +209,7 @@ void TFTDisplay::FillCircle (int radius) {
 }
 
 void TFTDisplay::FillCircle (int radius, int x, int y) {
-  MoveTo(x, y);
+  xpos = x; ypos = y;
   FillCircle(radius);
 }
 
@@ -234,7 +233,7 @@ void TFTDisplay::DrawCircle (int radius) {
 }
 
 void TFTDisplay::DrawCircle (int radius, int x, int y) {
-  MoveTo(x, y);
+  xpos = x; ypos = y;
   
   DrawCircle(radius);
 }
@@ -268,7 +267,7 @@ void TFTDisplay::PlotChar (char c, bool background) {
 }
 
 void TFTDisplay::PlotChar (char c, int x, int y) {
-  MoveTo(x, y);
+  xpos = x; ypos = y;
   PlotChar(c);
 }
 
@@ -299,7 +298,7 @@ void TFTDisplay::PlotTextCentered(PGM_P p, int centerX, int centerY, int scale_,
     if (c == 0) break;
     len = len + 6*scale_;
   }
-  MoveTo(centerX-(len>>1), centerY-4*scale_);
+  xpos = centerX-(len>>1); ypos = centerY-4*scale_;
   PlotText(p, scale_, background);
 }
 
