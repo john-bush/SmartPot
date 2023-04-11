@@ -39,6 +39,8 @@ class Interface : public TFTDisplay
 
         const int plant_icon_dim = 60;
 
+        int plantSelection = 0; // 0 is first plant, 1 is second plant, etc.
+        int currPlantHover = 0; // indicating the plant that the user is hovering on currently
 
         
 };
