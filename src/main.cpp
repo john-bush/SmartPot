@@ -1,4 +1,6 @@
 #include "main.h"
+#include "i2c.h"
+#include "tsl2591.h"
 
 float p = 3.1415926;
 
@@ -7,6 +9,7 @@ void setup(void) {
   ClearDisplay();
   DisplayOn();
   MoveTo(0,0);
+  i2c_init(BDIV); 
 
   DDRC &= ~(0<<PC0);
   // TestChart();
@@ -15,10 +18,20 @@ void setup(void) {
 void loop() {
   //BarChart();
   delay(2000);
-  ClearDisplay();
+  //ClearDisplay();
   //Waterfall();
   for (;;){
-    ReadSoil();
+    // auto status = rd_tsl_status();
+    // MoveTo(160,20);
+    // PlotInt(status);
+
+    uint32_t lum =  rd_tsl_luminosity();
+    MoveTo(160,40);
+    PlotInt(lum);
+
+    delay(2000);
+
+    //ReadSoil();
   };
   
   
