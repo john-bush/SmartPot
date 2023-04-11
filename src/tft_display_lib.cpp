@@ -273,6 +273,13 @@ void TFTDisplay::DrawRect(int w, int h, int x, int y)
   DrawRect(w, h);
 }
 
+void TFTDisplay::DrawCenteredRect(int w, int h, int x, int y)
+{
+  xpos = x - w / 2;
+  ypos = y - h / 2;
+  DrawRect(w, h);
+}
+
 void TFTDisplay::FillCircle(int radius)
 {
   int x1 = xpos, y1 = ypos, dx = 1, dy = 1;
@@ -389,6 +396,7 @@ void TFTDisplay::PlotChar(char c, bool background)
   xpos = xpos + 6 * scale; // Advance to next character position
 }
 
+
 void TFTDisplay::PlotChar(char c, int x, int y)
 {
   xpos = x;
@@ -435,6 +443,29 @@ void TFTDisplay::PlotTextCentered(PGM_P p, int centerX, int centerY, int scale_,
   xpos = centerX - (len >> 1);
   ypos = centerY - 4 * scale_;
   PlotText(p, scale_, background);
+}
+
+void TFTDisplay::PlotTextCentered(const char (&p)[4], int centerX, int centerY, int scale_, bool background)
+{
+  int len = 0;
+  int i = 0;
+  while (1)
+  {
+    char c = p[i++];
+    if (c == 0)
+      break;
+    len = len + 6 * scale_;
+  }
+  xpos = centerX - (len >> 1);
+  ypos = centerY - 4 * scale_;
+  i = 0;
+  while (1)
+  {
+    char c = p[i++];
+    if (c == 0)
+      return;
+    PlotChar(c, background);
+  }
 }
 
 void TFTDisplay::PlotInt(int n)

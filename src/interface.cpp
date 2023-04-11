@@ -58,7 +58,31 @@ void Interface::UpdateTank(int tankNum, int full) {
 }
 
 void Interface::DrawPlantSelectionScreen() {
-    
+    Display.FillScreen(Display.Green);
+    Display.PlotTextCentered(PSTR("Select Plant Type"), Display.xsize>>1, Display.ysize*0.8, 3, true);
+    int offset = (currPlantHover > 2) ? 1 : 0;
+    for (int i = 0; i < 3; i++) {
+        int x = 20 + (2 * i + 1) * (Display.xsize-40)/6;
+        int image_y = Display.ysize*0.6;
+        int index = i + offset % 4;
+        Display.SetForeColor(Display.Black);
+        Display.DrawCenteredRect(62, 62, x, image_y);
+        Display.DrawImage(plantPtr[index], 60, 60, x, image_y);
+
+        // write plant name under image
+        Display.PlotTextCentered(plantNames[index], x, Display.ysize*0.35, 2);
+    }
+
+    Display.DrawImage(push, 20, 20, Display.xsize * 0.1, Display.ysize * 0.1);
+    Display.PlotTextCentered(PSTR("Select"), Display.xsize * 0.2, Display.ysize * 0.1, 1);
+    Display.DrawImage(scroll, 15, 15, Display.xsize * 0.6, Display.ysize * 0.1);
+    Display.PlotTextCentered(PSTR("Scroll"), Display.xsize * 0.7, Display.ysize * 0.1, 1);
+
+    if (offset = 1) {
+        Display.DrawImage(left_arrow, 25, 25, Display.xsize * 0.9, Display.ysize>>1, true);
+    } else {
+        Display.DrawImage(left_arrow, 25, 25, Display.xsize * 0.1, Display.ysize>>1);
+    }
 }
 
 void Interface::UpdatePlantSelectionScreen() {

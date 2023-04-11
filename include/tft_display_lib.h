@@ -62,6 +62,7 @@ class TFTDisplay {
         void FillRect (int w, int h, int x, int y);
         void DrawRect (int w, int h);
         void DrawRect (int w, int h, int x, int y);
+        void DrawCenteredRect(int w, int h, int x, int y);
         void FillCircle (int radius);
         void FillCircle (int radius, int x, int y);
         void DrawCircle (int radius);
@@ -75,6 +76,7 @@ class TFTDisplay {
          * Writes Text block with center at position x, y
         */
         void PlotTextCentered(PGM_P p, int x, int y, int scale_, bool background = true);
+        void PlotTextCentered(const char (&strArray)[4], int centerX, int centerY, int scale_, bool background);
         void PlotInt(int n);
         void TestChart ();
         void BarChart ();
