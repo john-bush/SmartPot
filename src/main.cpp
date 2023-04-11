@@ -9,7 +9,6 @@ void setup(void)
     InitEncoder();
     ui.Init();
     ui.LoadingScreen();
-    
 
     delay(2000);
 
@@ -31,8 +30,6 @@ void loop()
     delay(2000);
     ui.UpdateTank(0, 0);
 }
-
-
 
 void encoderISR()
 {
@@ -64,19 +61,21 @@ void encoderISR()
 void buttonISR()
 {
     // Read button state
-  buttonState = digitalRead(buttonPin);
+    buttonState = digitalRead(buttonPin);
 
-  // Check for button press with debounce
-  if (buttonState != lastButtonState) {
-    if ((millis() - lastDebounceTime) > debounceDelay) {
-      if (buttonState == LOW) {
-        // call UI update function
-      }
-      lastDebounceTime = millis();
+    // Check for button press with debounce
+    if (buttonState != lastButtonState)
+    {
+        if ((millis() - lastDebounceTime) > debounceDelay)
+        {
+            if (buttonState == LOW)
+            {
+                // call UI update function
+            }
+            lastDebounceTime = millis();
+        }
+        lastButtonState = buttonState;
     }
-    lastButtonState = buttonState;
-  }
-
 }
 
 void InitEncoder()
