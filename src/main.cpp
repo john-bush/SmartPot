@@ -29,6 +29,13 @@ void loop()
 
     delay(2000);
     ui.UpdateTank(0, 0);
+
+    delay(2000);
+    ui.DrawPlantSelectionScreen();
+
+    ui.ScrollForward();
+    delay(2000);
+    ui.UpdatePlantSelectionScreen();
 }
 
 void encoderISR()

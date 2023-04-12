@@ -136,7 +136,7 @@ void TFTDisplay::PlotPoint(int x, int y)
   PORT_TOGGLE(1 << cs);
 }
 
-void TFTDisplay::DrawImage(const uint16_t *image, int w, int h, int centerX, int centerY, bool mirror)
+void TFTDisplay::DrawImage(const uint16_t *image, int w, int h, int centerX, int centerY, int scale, bool mirror)
 {
   int imageOriginX = centerX - w / 2;
   int imageOriginY = centerY + h / 2;
@@ -152,7 +152,14 @@ void TFTDisplay::DrawImage(const uint16_t *image, int w, int h, int centerX, int
       } else {
         fore = pgm_read_word(&image[y * w + x]);
       }
-      PlotPoint(imageOriginX + x, imageOriginY - y);
+      for (int i = 0; i < scale; i++)
+      {
+        for (int j = 0; j < scale; j++)
+        {
+          PlotPoint(imageOriginX + x + i, imageOriginY - y - j);  // needs to be tested
+        }
+      }
+      // PlotPoint(imageOriginX + x, imageOriginY - y); // wordks
     }
   }
   fore = fore_copy; // revert to old fore color

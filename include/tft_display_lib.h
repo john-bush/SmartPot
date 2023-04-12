@@ -55,7 +55,7 @@ class TFTDisplay {
         void PlotPoint (int x, int y);
 
         // draws an image with width w and height h defined by color map *image centered at position x,y
-        void DrawImage(const uint16_t *image, int w, int h, int centerX, int centerY, bool mirror = false);
+        void DrawImage(const uint16_t *image, int w, int h, int centerX, int centerY, int scale = 1, bool mirror = false);
         void DrawTo (int x, int y);
         void DrawTo (int x1, int y1, int x2, int y2);
         void FillRect (int w, int h);
