@@ -8,7 +8,7 @@
 // Find divisors for the UART0 and I2C baud rates
 #define FOSC 9830400            // Clock frequency = Oscillator freq.
 #define BAUD 9600               // UART0 baud rate
-#define MYUBRR FOSC/16/BAUD-1   // Value for UBRR0 register
+#define MYUBRR FOSC/16/BAUD-1   // Value for UBRR0 registerg
 #define BDIV (FOSC / 100000 - 16) / 2 + 1    // Puts I2C rate just below 100kHz
 
 /* Address of the EEPROM on the I2C bus */

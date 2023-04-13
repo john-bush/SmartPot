@@ -1,5 +1,6 @@
 #include "tsl2591.h"
 #include "i2c.h"
+#include "interface.h"
 
 
 
@@ -26,17 +27,17 @@ uint8_t tsl_disable(){
     uint8_t reg_data[1];
 
     reg_data[0] =  TSL2591_ENABLE_POWEROFF;
-    uint8_t res;
+    uint8_t res = 0;
     res = i2c_io(LIGHT_SENSOR_ADDR, reg_addr, 1, reg_data, 1, nullptr, 0);
     return res;
 }
 
 uint32_t rd_tsl_luminosity(){
+    uint32_t result;
 
     tsl_enable();
-    _delay_ms(120);
 
-    uint32_t result;
+    delay(100);
 
     uint8_t reg_addr[1];
     reg_addr[0] = TSL2591_COMMAND_BIT | TSL2591_REGISTER_CHAN0_LOW;
@@ -48,20 +49,19 @@ uint32_t rd_tsl_luminosity(){
     
     reg_addr[0] = TSL2591_COMMAND_BIT | TSL2591_REGISTER_CHAN0_HIGH;
 
-    i2c_io(LIGHT_SENSOR_ADDR, reg_addr,1, nullptr, 0, rd_data_h, 2);
+    delay(100);
 
-    result = rd_data_l[0];
-    
-    result = (static_cast<uint32_t>(rd_data_h[0]) << 24 ) | 
-             (static_cast<uint32_t>(rd_data_h[1]) << 16 ) | 
-             (static_cast<uint32_t>(rd_data_l[0]) << 8 ) | 
-             (static_cast<uint32_t>(rd_data_l[1]));
+    uint8_t s = i2c_io(LIGHT_SENSOR_ADDR, reg_addr,1, nullptr, 0, rd_data_h, 2);
 
+    result = (uint32_t(rd_data_h[0]) << 24 ) | 
+             (uint32_t(rd_data_h[1]) << 16 ) | 
+             (uint32_t(rd_data_l[0]) << 8 ) | 
+             (uint32_t(rd_data_l[1]));
+
+    delay(100);
     tsl_disable();
-
-
+    
     return result;
-
 }
 
 

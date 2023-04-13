@@ -24,7 +24,6 @@
 #include "i2c.h"
 
 
-
 /* Test strings to store in the EEPROM */
 // char *strs[] = {
 //     "1: EE459Lx at328-7.c - 5/12/12",
