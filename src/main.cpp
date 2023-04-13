@@ -3,10 +3,13 @@
 #include "tsl2591.h"
 #include "dht20.h"
 
+#include "analog.h"
+
 float p = 3.1415926;
 
 Interface ui = Interface();
 DHT20 dht = DHT20();
+TSL2591 tsl = TSL2591();
 
 void setup(void)
 {
@@ -44,14 +47,18 @@ void loop()
     // ui.PlotInt(lum);
     // delay(1000);
 
-    uint32_t lum = rd_tsl_luminosity();
+    ui.MoveTo(80, 100);
+    ui.PlotText(PSTR("Soil Moisture Level: "));
+    ui.PlotInt(read_soil_moisture());
+
+    uint32_t lum = tsl.rd_luminosity();
     ui.MoveTo(80, 80);
     ui.SetTextColor(0xFFFF);
     
     ui.PlotText(PSTR("Luminosity: "));
     ui.PlotInt(lum);
 
-    uint8_t res = dht.full_measurement();
+    dht.full_measurement();
     ui.MoveTo(80, 60);
     ui.PlotText(PSTR("Temperature: "));
     ui.PlotInt( /*res);*/dht.get_temperature());
@@ -59,18 +66,18 @@ void loop()
     ui.PlotText(PSTR("Humidity: "));
     ui.PlotInt(dht.get_humidity());
 
+    ui.MoveTo(80, 20);
+    ui.PlotText(PSTR("Water Level: "));
+    ui.PlotInt(read_water_level_pins());
+
+
 
 
     delay(1000);
     ui.ClearDisplay();
 
-    // lum = tsl_disable();
-    // ui.MoveTo(160, 0);
-    // ui.PlotInt(lum);
 
-    // delay(1000);
 
-    //ReadSoil();
 }
 
 void encoderISR()
@@ -130,11 +137,4 @@ void InitEncoder()
     // Attach interrupts to encoder and button pins
     attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
     attachInterrupt(digitalPinToInterrupt(buttonPin), buttonISR, FALLING);
-}
-
-void ReadSoil(){
-  int soil_read = analogRead(PC0);
-  ui.MoveTo(160, 160);
-  delay(1000);
-  ui.PlotInt(soil_read);
 }

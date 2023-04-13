@@ -48,7 +48,12 @@ enum {
   TSL2591_REGISTER_CHAN1_HIGH = 0x17,     // Channel 1 data, high byte
 };
 
-uint8_t tsl_enable();
-uint8_t tsl_disable();
-uint8_t rd_tsl_status();
-uint32_t rd_tsl_luminosity();
+
+class TSL2591{
+  public:
+  uint8_t enable();
+  uint8_t disable();
+  uint8_t rd_status();
+  uint32_t rd_luminosity();
+
+};

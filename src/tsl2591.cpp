@@ -4,7 +4,7 @@
 
 
 
-uint8_t tsl_enable(){
+uint8_t TSL2591::enable(){
     uint8_t reg_addr[1];
     reg_addr[0] = TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE;
     
@@ -20,7 +20,7 @@ uint8_t tsl_enable(){
 }
 
 
-uint8_t tsl_disable(){
+uint8_t TSL2591::disable(){
     uint8_t reg_addr[1];
     reg_addr[0] = TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE;
     
@@ -32,44 +32,43 @@ uint8_t tsl_disable(){
     return res;
 }
 
-uint32_t rd_tsl_luminosity(){
+uint32_t TSL2591::rd_luminosity(){
     uint32_t result;
 
-    tsl_enable();
+    enable();
 
     delay(100);
 
     uint8_t reg_addr[1];
     reg_addr[0] = TSL2591_COMMAND_BIT | TSL2591_REGISTER_CHAN0_LOW;
     
-    uint8_t rd_data_h[2];
-    uint8_t rd_data_l[2];
+    uint8_t channel_one[2]; // Just the IR reading
+    uint8_t channel_zero[2]; // Visible + IR
 
-    i2c_io(LIGHT_SENSOR_ADDR, reg_addr,1, nullptr, 0, rd_data_l, 2);
+    i2c_io(LIGHT_SENSOR_ADDR, reg_addr,1, nullptr, 0, channel_zero, 2);
     
-    reg_addr[0] = TSL2591_COMMAND_BIT | TSL2591_REGISTER_CHAN0_HIGH;
+    reg_addr[0] = TSL2591_COMMAND_BIT | TSL2591_REGISTER_CHAN1_LOW;
 
     delay(100);
 
-    uint8_t s = i2c_io(LIGHT_SENSOR_ADDR, reg_addr,1, nullptr, 0, rd_data_h, 2);
+    uint8_t s = i2c_io(LIGHT_SENSOR_ADDR, reg_addr,1, nullptr, 0, channel_one, 2);
 
-    result = (uint32_t(rd_data_h[0]) << 24 ) | 
-             (uint32_t(rd_data_h[1]) << 16 ) | 
-             (uint32_t(rd_data_l[0]) << 8 ) | 
-             (uint32_t(rd_data_l[1]));
+    result = ((uint32_t(channel_zero[0]) << 8) | 
+             (uint32_t(channel_zero[1]))) -
+             ((uint32_t(channel_one[0]) << 8 ) | 
+             (uint32_t(channel_one[1])));
 
     delay(100);
-    tsl_disable();
+    disable();
     
     return result;
 }
 
 
-uint8_t rd_tsl_status(){
-    uint8_t io_status;
+uint8_t TSL2591::rd_status(){
     uint8_t cmd[1];
     uint8_t result[1];
     cmd[0]= TSL2591_COMMAND_BIT | TSL2591_REGISTER_DEVICE_STATUS;
-    io_status = i2c_io(LIGHT_SENSOR_ADDR, cmd, 1, NULL, 0, result, 1);
+    i2c_io(LIGHT_SENSOR_ADDR, cmd, 1, NULL, 0, result, 1);
     return result[0];
 }

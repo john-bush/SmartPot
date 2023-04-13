@@ -81,7 +81,6 @@ class TFTDisplay {
         void TestChart ();
         void BarChart ();
         void Waterfall ();
-        void ReadSoil();
 
         // Adafruit 1.47" 320x172 rounded rectangle display
         int const xsize = 320, ysize = 172, xoff = 0, yoff = 34, invert = 1, rotate = 0, bgr = 0;
