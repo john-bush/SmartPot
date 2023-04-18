@@ -47,9 +47,13 @@ class Interface : public TFTDisplay
 
         int plantSelection = 0; // 0 is first plant, 1 is second plant, etc.
         int currPlantHover = 0; // indicating the plant that the user is hovering on currently
+        int scrollOffset = 0; // the scrolling offset of the plant selection screen. 0 is no offset, 1 is one plant offset, etc.
+        int prevPlantHover = 0;
 
         bool configured = false; // true if the user has configured the system
 
+        char* plantNames[4];
+        
 
         
 };

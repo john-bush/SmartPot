@@ -570,7 +570,8 @@ const uint16_t flowers_small[] PROGMEM = { // 30 x 30
 };
 
 static const uint16_t *plantPtr[4] = {succulent_small, leafy_plant_small, cactus_small, flowers_small};
-static const char plantNames[4][16] = {" Succulent ", "Leafy Plant", "  Cactus   ", "  Flowers  "};
+
+
 
 /***********************************************************************************************
  * ICONS
