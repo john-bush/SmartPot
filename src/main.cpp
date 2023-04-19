@@ -6,9 +6,15 @@ Interface ui = Interface();
 
 void setup(void)
 {
+    Serial.begin(9600);
+    Serial.println("Initializing");
     InitEncoder();
     ui.Init();
-    ui.LoadingScreen();
+    //ui.LoadingScreen();
+    ui.ClearDisplay();
+
+
+
 
     delay(2000);
 
@@ -41,8 +47,9 @@ void loop()
 void encoderISR()
 {
     // Read encoder state
-    int a = digitalRead(encoderPinA);
-    int b = digitalRead(encoderPinB);
+    int a = digitalRead(ENCODER_PIN_A);
+    int b = digitalRead(ENCODER_PIN_B);
+
     encoderState = (a << 1) | b;
 
     // Check for changes in encoder state
@@ -68,7 +75,7 @@ void encoderISR()
 void buttonISR()
 {
     // Read button state
-    buttonState = digitalRead(buttonPin);
+    buttonState = digitalRead(BUTTON_PIN);
 
     // Check for button press with debounce
     if (buttonState != lastButtonState)
@@ -78,6 +85,7 @@ void buttonISR()
             if (buttonState == LOW)
             {
                 // call UI update function
+                Serial.println("Button Pressed");
             }
             lastDebounceTime = millis();
         }
@@ -88,11 +96,24 @@ void buttonISR()
 void InitEncoder()
 {
     // Initialize pins as input/output
-    pinMode(encoderPinA, INPUT);
-    pinMode(encoderPinB, INPUT);
-    pinMode(buttonPin, INPUT_PULLUP);
 
-    // Attach interrupts to encoder and button pins
-    attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(buttonPin), buttonISR, FALLING);
+    PCICR |= _BV(PCIE2); //enable interrupts on pin changes for reg D
+	PCMSK2 |= _BV(PCINT2) |  _BV(PCINT3) | _BV(PCINT4); // mask for interrupts on pins D2,D3,D4 (pins 4,5,6)
+    sei(); // Enable Global Interrupts
+
+    pinMode(ENCODER_PIN_A, INPUT);
+    pinMode(ENCODER_PIN_B, INPUT);
+    pinMode(BUTTON_PIN, INPUT);
+
+}
+
+
+ISR(PCINT2_vect)
+{
+
+  //Serial.println("Interrupt");
+  buttonISR();
+  encoderISR();
+
+
 }

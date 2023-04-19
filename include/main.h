@@ -15,10 +15,9 @@
  * Constants and Declarations for the Encoder
 */
 // Define pin numbers for encoder
-const int encoderPinA = 2;
-const int encoderPinB = 3;
-const int buttonPin = 4;
-
+#define BUTTON_PIN PIND2
+#define ENCODER_PIN_A PIND3
+#define ENCODER_PIN_B PIND4
 // Define variables for encoder state and button state
 volatile int encoderState = 0;
 volatile int lastEncoderState = 0;
