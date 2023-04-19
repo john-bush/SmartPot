@@ -16,7 +16,7 @@ void setup(void)
 
 
 
-    delay(2000);
+    Serial.begin(9600);
 
     // Color(0, 0, 255);
     // FillCircle(30);
@@ -37,11 +37,28 @@ void loop()
     ui.UpdateTank(0, 0);
 
     delay(2000);
-    ui.DrawPlantSelectionScreen();
 
+    
+    ui.DrawPlantSelectionScreen();
+    delay(2000);
     ui.ScrollForward();
     delay(2000);
-    ui.UpdatePlantSelectionScreen();
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollBackward();
+
+    ui.DrawPlantConfirmationScreen();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollBackward();
+    delay(5000);
 }
 
 void encoderISR()
