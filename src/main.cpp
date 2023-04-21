@@ -1,8 +1,15 @@
 #include "main.h"
+#include "i2c.h"
+#include "tsl2591.h"
+#include "dht20.h"
+
+#include "analog.h"
 
 float p = 3.1415926;
 
 Interface ui = Interface();
+DHT20 dht = DHT20();
+TSL2591 tsl = TSL2591();
 
 void setup(void)
 {
@@ -11,17 +18,16 @@ void setup(void)
     InitEncoder();
     ui.Init();
     //ui.LoadingScreen();
+
+    i2c_init(BDIV);
     ui.ClearDisplay();
-
-
-
-
     Serial.begin(9600);
 
     // Color(0, 0, 255);
     // FillCircle(30);
     // TestChart();
 }
+
 
 void loop()
 {
@@ -32,6 +38,23 @@ void loop()
 
     delay(2000);
     ui.UpdateTank(1, 1);
+
+    delay(2000);
+    ui.UpdateTank(0, 0);
+
+    uint32_t luminosity = tsl.rd_luminosity();
+    dht.full_measurement();
+    float humidity = dht.get_humidity();
+    float temperature = dht.get_temperature();
+
+    Serial.printf("Luminosity: %d \n", luminosity);
+    Serial.printf("Humidity: %d \n", humidity);
+    Serial.printf("Temperature: %d \n", temperature);
+
+    delay(1000);
+    ui.ClearDisplay();
+
+
 
     delay(2000);
     ui.UpdateTank(0, 0);

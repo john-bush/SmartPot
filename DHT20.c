@@ -25,7 +25,7 @@ uint8_t sensor_read_data(uint8_t *buffer, uint8_t count) {
 int main(void) {
     uint8_t buffer[4];
     float temperature, humidity;
-    i2c_init();
+    //i2c_init();
     while (1) {
         sensor_send_command(0x2C); // start measurement with high repeatability
         _delay_ms(16); // wait for measurement to complete

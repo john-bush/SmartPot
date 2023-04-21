@@ -34,5 +34,4 @@ const unsigned long debounceDelay = 50;
 void encoderISR();
 void buttonISR();
 void InitEncoder();
-
 /**************************************************************************/

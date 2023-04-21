@@ -485,7 +485,7 @@ void TFTDisplay::PlotTextCentered(const char* str, int centerX, int centerY, int
 void TFTDisplay::PlotInt(int n)
 {
   bool lead = false;
-  for (int d = 10000; d > 0; d = d / 10)
+  for (uint32_t d = 10000000; d > 0; d = d / 10)
   {
     char j = (n / d) % 10;
     if (j != 0 || lead || d == 1)
@@ -619,3 +619,5 @@ void TFTDisplay::Waterfall()
     }
   }
 }
+
+
