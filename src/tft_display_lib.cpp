@@ -136,11 +136,14 @@ void TFTDisplay::PlotPoint(int x, int y)
   PORT_TOGGLE(1 << cs);
 }
 
-void TFTDisplay::DrawImage(const uint16_t *image, int w, int h, int centerX, int centerY, bool mirror)
+void TFTDisplay::DrawImage(const uint16_t *image, int w, int h, int centerX, int centerY, bool mirror, int scale)
 {
-  int imageOriginX = centerX - w / 2;
-  int imageOriginY = centerY + h / 2;
+  int imageOriginX = centerX - (scale * w) / 2;
+  int imageOriginY = centerY + (scale * h) / 2;
   int fore_copy = fore;
+  if (mirror){
+    Serial.println("Mirrored Image");
+  }
   for (int y = 0; y < h; y++)
   {
     for (int x = 0; x < w; x++)
@@ -152,7 +155,14 @@ void TFTDisplay::DrawImage(const uint16_t *image, int w, int h, int centerX, int
       } else {
         fore = pgm_read_word(&image[y * w + x]);
       }
-      PlotPoint(imageOriginX + x, imageOriginY - y);
+      for (int i = 0; i < scale; i++)
+      {
+        for (int j = 0; j < scale; j++)
+        {
+          PlotPoint(imageOriginX + (scale * x) + i, imageOriginY - (scale * y) - j);  // needs to be tested
+        }
+      }
+      // PlotPoint(imageOriginX + x, imageOriginY - y); // wordks
     }
   }
   fore = fore_copy; // revert to old fore color
@@ -252,6 +262,12 @@ void TFTDisplay::FillRect(int w, int h, int x, int y)
   FillRect(w, h);
 }
 
+void TFTDisplay::FillCenteredRect(int w, int h, int centerX, int centerY) {
+  xpos = centerX - w / 2;
+  ypos = centerY - h / 2;
+  FillRect(w, h);
+}
+
 void TFTDisplay::DrawRect(int w, int h)
 {
   int x1 = xpos, y1 = ypos;
@@ -273,11 +289,15 @@ void TFTDisplay::DrawRect(int w, int h, int x, int y)
   DrawRect(w, h);
 }
 
-void TFTDisplay::DrawCenteredRect(int w, int h, int x, int y)
+void TFTDisplay::DrawCenteredRect(int w, int h, int x, int y, int thickness)
 {
-  xpos = x - w / 2;
-  ypos = y - h / 2;
-  DrawRect(w, h);
+  
+  for (int i = 0; i < thickness; i++)
+  {
+    xpos = x - w / 2 - i;
+    ypos = y - h / 2 - i;
+    DrawRect(w + 2 * i, h + 2 * i);
+  }
 }
 
 void TFTDisplay::FillCircle(int radius)
@@ -445,26 +465,20 @@ void TFTDisplay::PlotTextCentered(PGM_P p, int centerX, int centerY, int scale_,
   PlotText(p, scale_, background);
 }
 
-void TFTDisplay::PlotTextCentered(const char (&p)[4], int centerX, int centerY, int scale_, bool background)
+void TFTDisplay::PlotTextCentered(const char* str, int centerX, int centerY, int scale_, int color)
 {
+  int numChar = 12;
   int len = 0;
-  int i = 0;
-  while (1)
-  {
-    char c = p[i++];
-    if (c == 0)
-      break;
-    len = len + 6 * scale_;
-  }
+  scale = scale_;
+  // Count the number of characters in the string
+  len = numChar * 6 * scale_;
+
   xpos = centerX - (len >> 1);
   ypos = centerY - 4 * scale_;
-  i = 0;
-  while (1)
-  {
-    char c = p[i++];
-    if (c == 0)
-      return;
-    PlotChar(c, background);
+  
+  // Print each character on a separate line
+  for (int i = 0; i < numChar; i++) {
+    PlotChar(str[i], true);
   }
 }
 

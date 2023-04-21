@@ -13,13 +13,15 @@ TSL2591 tsl = TSL2591();
 
 void setup(void)
 {
+    Serial.begin(9600);
+    Serial.println("Initializing");
     InitEncoder();
     ui.Init();
     //ui.LoadingScreen();
 
     i2c_init(BDIV);
-
     ui.ClearDisplay();
+    Serial.begin(9600);
 
     // Color(0, 0, 255);
     // FillCircle(30);
@@ -29,62 +31,72 @@ void setup(void)
 
 void loop()
 {
-    // ui.DrawTankScreen();
+    ui.DrawTankScreen();
 
-    // delay(2000);
-    // ui.UpdateTank(0, 1);
+    delay(2000);
+    ui.UpdateTank(0, 1);
 
-    // delay(2000);
-    // ui.UpdateTank(1, 1);
+    delay(2000);
+    ui.UpdateTank(1, 1);
 
-    // delay(2000);
-    // ui.UpdateTank(0, 0);
+    delay(2000);
+    ui.UpdateTank(0, 0);
 
-
-    // uint32_t lum = tsl_enable();  //rd_tsl_luminosity();
-    // ui.MoveTo(160,40);
-    // ui.SetTextColor(0xFFFF);
-    // ui.PlotInt(lum);
-    // delay(1000);
-
-    ui.MoveTo(80, 100);
-    ui.PlotText(PSTR("Soil Moisture Level: "));
-    ui.PlotInt(read_soil_moisture());
-
-    uint32_t lum = tsl.rd_luminosity();
-    ui.MoveTo(80, 80);
-    ui.SetTextColor(0xFFFF);
-    
-    ui.PlotText(PSTR("Luminosity: "));
-    ui.PlotInt(lum);
-
+    uint32_t luminosity = tsl.rd_luminosity();
     dht.full_measurement();
-    ui.MoveTo(80, 60);
-    ui.PlotText(PSTR("Temperature: "));
-    ui.PlotInt( /*res);*/dht.get_temperature());
-    ui.MoveTo(80, 40);
-    ui.PlotText(PSTR("Humidity: "));
-    ui.PlotInt(dht.get_humidity());
+    float humidity = dht.get_humidity();
+    float temperature = dht.get_temperature();
 
-    ui.MoveTo(80, 20);
-    ui.PlotText(PSTR("Water Level: "));
-    ui.PlotInt(read_water_level_pins());
-
-
-
+    Serial.printf("Luminosity: %d \n", luminosity);
+    Serial.printf("Humidity: %d \n", humidity);
+    Serial.printf("Temperature: %d \n", temperature);
 
     delay(1000);
     ui.ClearDisplay();
 
 
 
+    delay(2000);
+    ui.UpdateTank(0, 0);
+
+    delay(2000);
+
+    
+    ui.DrawPlantSelectionScreen();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollBackward();
+
+    ui.DrawPlantConfirmationScreen();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollForward();
+    delay(2000);
+    ui.ScrollBackward();
+    delay(5000);
 }
 
 void encoderISR()
 {
+    //check if the interrupt is a button change
+    buttonState = digitalRead(BUTTON_PIN);
+    if(buttonState != lastButtonState){
+        return;
+    }
+
+
     // Read encoder state
-    int a = digitalRead(encoderPinA);
-    int b = digitalRead(encoderPinB);
+    int a = digitalRead(ENCODER_PIN_A);
+    int b = digitalRead(ENCODER_PIN_B);
+
     encoderState = (a << 1) | b;
 
     // Check for changes in encoder state
@@ -96,10 +108,16 @@ void encoderISR()
             (lastEncoderState == 0b01 && encoderState == 0b00))
         {
             encoderCount++;
+            if(encoderCount %4 ==0){
+                ui.ScrollForward();
+            }
         }
         else
         {
             encoderCount--;
+            if(encoderCount %4 ==0){
+                ui.ScrollBackward();
+            }
         }
         Serial.print("Encoder count: ");
         Serial.println(encoderCount);
@@ -110,7 +128,7 @@ void encoderISR()
 void buttonISR()
 {
     // Read button state
-    buttonState = digitalRead(buttonPin);
+    buttonState = digitalRead(BUTTON_PIN);
 
     // Check for button press with debounce
     if (buttonState != lastButtonState)
@@ -120,6 +138,7 @@ void buttonISR()
             if (buttonState == LOW)
             {
                 // call UI update function
+                Serial.println("Button Pressed");
             }
             lastDebounceTime = millis();
         }
@@ -130,11 +149,24 @@ void buttonISR()
 void InitEncoder()
 {
     // Initialize pins as input/output
-    pinMode(encoderPinA, INPUT);
-    pinMode(encoderPinB, INPUT);
-    pinMode(buttonPin, INPUT_PULLUP);
 
-    // Attach interrupts to encoder and button pins
-    attachInterrupt(digitalPinToInterrupt(encoderPinA), encoderISR, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(buttonPin), buttonISR, FALLING);
+    PCICR |= _BV(PCIE2); //enable interrupts on pin changes for reg D
+	PCMSK2 |= _BV(PCINT2) |  _BV(PCINT3) | _BV(PCINT4); // mask for interrupts on pins D2,D3,D4 (pins 4,5,6)
+    sei(); // Enable Global Interrupts
+
+    pinMode(ENCODER_PIN_A, INPUT);
+    pinMode(ENCODER_PIN_B, INPUT);
+    pinMode(BUTTON_PIN, INPUT);
+
+}
+
+
+ISR(PCINT2_vect)
+{
+
+  //Serial.println("Interrupt");
+  buttonISR();
+  encoderISR();
+
+
 }
