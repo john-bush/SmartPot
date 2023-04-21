@@ -334,8 +334,8 @@ void TFTDisplay::FillCircle(int radius)
 
 void TFTDisplay::FillCircle(int radius, int x, int y)
 {
-  xpos = x;
-  ypos = y;
+  xpos = x + radius;
+  ypos = y + radius;
   FillCircle(radius);
 }
 
@@ -480,6 +480,13 @@ void TFTDisplay::PlotTextCentered(const char* str, int centerX, int centerY, int
   for (int i = 0; i < numChar; i++) {
     PlotChar(str[i], true);
   }
+}
+
+void TFTDisplay::PlotTextLeftAligned(PGM_P p, int x, int y, int scale_, bool background = true)
+{
+  xpos = x;
+  ypos = y;
+  PlotText(p, scale_, background);
 }
 
 void TFTDisplay::PlotInt(int n)

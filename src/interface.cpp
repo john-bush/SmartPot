@@ -157,9 +157,9 @@ void Interface::UpdatePlantConfirmationScreen() {
 void Interface::DrawPlantDashboard() {
     state = 4;
     Display.FillScreen(Display.Green);
-    Display.PlotTextCentered(PSTR("Your Plant Dashboard"), Display.xsize>>1, Display.ysize*0.8, 3, true);
+    Display.PlotTextCentered(PSTR("Your Plant Dashboard"), Display.xsize>>1, Display.ysize*0.85, 2, true);
     Display.DrawImage(plantPtr[currPlantHover], 30, 30, Display.xsize>>1, Display.ysize*0.6, false);
-    Display.PlotTextCentered(plantNames[currPlantHover], Display.xsize>>1, Display.ysize*0.35, 2);
+    Display.PlotTextCentered(plantNames[currPlantHover], Display.xsize>>1, Display.ysize*0.35, 2, 1);
     
     Display.DrawImage(left_arrow, 25, 25, Display.xsize * 0.2, Display.ysize*0.2, false);
     Display.PlotTextCentered(PSTR("return"), Display.xsize*0.3, Display.ysize*0.2, 1);
@@ -167,6 +167,17 @@ void Interface::DrawPlantDashboard() {
     Display.DrawImage(left_arrow, 25, 25, Display.xsize * 0.8, Display.ysize*0.2, true);
     Display.PlotTextCentered(PSTR("confirm"), Display.xsize * 0.7, Display.ysize*0.2, 1);
 
+    // show temperature
+    Display.PlotTextLeftAligned(PSTR("Temp:     "), Display.xsize * 0.1, Display.ysize*0.7, 1, 1);
+
+    // show humidity
+    Display.PlotTextLeftAligned(PSTR("Humidity: "), Display.xsize * 0.1, Display.ysize*0.6, 1, 1);
+
+    // show light level
+    Display.PlotTextLeftAligned(PSTR("Light:    "), Display.xsize * 0.1, Display.ysize*0.5, 1, 1);
+
+
+    
     UpdatePlantDashboard();
 }
 
