@@ -63,6 +63,13 @@ void loop()
 
 void encoderISR()
 {
+    //check if the interrupt is a button change
+    buttonState = digitalRead(BUTTON_PIN);
+    if(buttonState != lastButtonState){
+        return;
+    }
+
+
     // Read encoder state
     int a = digitalRead(ENCODER_PIN_A);
     int b = digitalRead(ENCODER_PIN_B);
@@ -78,10 +85,16 @@ void encoderISR()
             (lastEncoderState == 0b01 && encoderState == 0b00))
         {
             encoderCount++;
+            if(encoderCount %4 ==0){
+                ui.ScrollForward();
+            }
         }
         else
         {
             encoderCount--;
+            if(encoderCount %4 ==0){
+                ui.ScrollBackward();
+            }
         }
         Serial.print("Encoder count: ");
         Serial.println(encoderCount);
