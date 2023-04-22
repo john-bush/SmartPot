@@ -334,8 +334,8 @@ void TFTDisplay::FillCircle(int radius)
 
 void TFTDisplay::FillCircle(int radius, int x, int y)
 {
-  xpos = x + radius;
-  ypos = y + radius;
+  xpos = x - radius;
+  ypos = y - radius;
   FillCircle(radius);
 }
 
@@ -465,9 +465,8 @@ void TFTDisplay::PlotTextCentered(PGM_P p, int centerX, int centerY, int scale_,
   PlotText(p, scale_, background);
 }
 
-void TFTDisplay::PlotTextCentered(const char* str, int centerX, int centerY, int scale_, int color)
+void TFTDisplay::PlotTextCentered(const char* str, int centerX, int centerY, int scale_, int numChar)
 {
-  int numChar = 12;
   int len = 0;
   scale = scale_;
   // Count the number of characters in the string

@@ -7,9 +7,6 @@
 // #include <SPI.h>
 
 
-
-
-
 /**************************************************************************/
 /**
  * Constants and Declarations for the Encoder

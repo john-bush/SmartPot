@@ -31,13 +31,15 @@ class Interface : public TFTDisplay
         void ScrollForward();
         void ScrollBackward();
         void ButtonPress();
+
+        void PollSensors();
+
+        void SetTank(int tank1, int tank2);
     
     private:
         int state = 0; // general state variable
         int numPlants = 4; // number of plant presets loaded in the system
-        int tankLevel1 = 0; // 0 is empty, 1 is full
-        int tankLevel2 = 0; // 0 is empty, 1 is full
-
+        
         int confirmationButton = 0; // 0 highlights "back", 1 highlights "confirm"
 
         const int tank_width = 40;
@@ -53,6 +55,14 @@ class Interface : public TFTDisplay
         bool configured = false; // true if the user has configured the system
 
         char* plantNames[4];
+
+        // Sensor variables
+        float temperature_ = 0.0f;
+        float light_ = 0.0f;
+        float humidity_ = 0.0f;
+
+        int tankLevel1 = 0; // 0 is empty, 1 is full
+        int tankLevel2 = 0; // 0 is empty, 1 is full
         
 
         

@@ -14,17 +14,17 @@ class DHT20{
 
     public:
     
-    uint8_t request_measurement();
-    uint8_t read_sensors();
+        uint8_t request_measurement();
+        uint8_t read_sensors();
 
-    uint8_t full_measurement();
-    float get_temperature();
-    float get_humidity();
+        uint8_t full_measurement();
+        float get_temperature();
+        float get_humidity();
 
     private:
-    uint32_t temperature_raw, humidity_raw;
+        uint32_t temperature_raw, humidity_raw;
 
-    float humidity;
-    float temperature;
+        float humidity;
+        float temperature;
 
 };
