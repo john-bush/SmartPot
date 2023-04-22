@@ -22,6 +22,12 @@
          ///< will generate an interrupt, bypassing the persist filter
 
 
+  #define TSL2591_LUX_DF 408.0   ///< Lux cooefficient
+
+  #define TSL2591_GAIN_LOW 0x00;
+  #define TSL2591_INTEGRATIONTIME_100MS 0x00
+
+
 /// TSL2591 Register map
 enum {
   TSL2591_REGISTER_ENABLE = 0x00,          // Enable register
@@ -49,11 +55,17 @@ enum {
 };
 
 
+
+
 class TSL2591{
   public:
+
+  void initialize();
   uint8_t enable();
   uint8_t disable();
   uint8_t rd_status();
-  uint32_t rd_luminosity();
+  long rd_luminosity();
+  long calculateLux(uint16_t ch0, uint16_t ch1);
+  uint8_t set_timing_and_gain();
 
 };
