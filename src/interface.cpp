@@ -194,7 +194,11 @@ void Interface::UpdatePlantDashboard() {
 
     // Update Light Level
     dtostrf(light_, 4, 3, buffer);
+
+    #ifdef DEBUG
     Serial.println(buffer);
+    #endif
+    
     Display.PlotTextCentered(buffer, Display.xsize * 0.5, Display.ysize*0.5+6, 2, 5);
     
     // Update Water Tank Indicator

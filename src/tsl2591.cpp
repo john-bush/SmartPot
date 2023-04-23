@@ -118,19 +118,7 @@ long TSL2591::calculateLux(uint16_t ch0, uint16_t ch1) {
 
   // Alternate lux calculation 2
   lux = ( ch0 - 1.7*ch1) / cpl;
-
-
-//   Serial.printf("Channel 0: %d \n" , ch0);
-//   Serial.printf("Channel 1: %d \n" , ch1);
-//   Serial.printf("atime: %d \n", int(atime));
-//   Serial.printf("again: %d \n", int(again));
-//   Serial.printf("df: %d \n", int(TSL2591_LUX_DF));
-
-//   Serial.printf("Cpl: %d \n", int(cpl*100));
- Serial.printf("LUX: %ld \n", long(lux));
-
-
-
+  
   // Signal I2C had no errors
   return long(lux);
 }

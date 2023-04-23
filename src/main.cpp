@@ -5,7 +5,7 @@
 
 #include "analog.h"
 
-// #define DEBUG
+//#define DEBUG
 
 float p = 3.1415926;
 
@@ -16,7 +16,9 @@ TSL2591 tsl = TSL2591();
 void setup(void)
 {
     Serial.begin(9600);
+    #ifdef DEBUG
     Serial.println("Initializing");
+    #endif
 
     ui.Init();
     // ui.LoadingScreen();
@@ -129,7 +131,7 @@ void encoderISR()
                 ui.ScrollBackward();
             }
         }
-        #ifndef DEBUG
+        #ifdef DEBUG
         Serial.print("Encoder count: ");
         Serial.println(encoderCount);
         #endif
@@ -156,7 +158,9 @@ void buttonISR()
                 if (oldState != state) {
                     firstLoop = true;
                 }
+                #ifdef DEBUG
                 Serial.println("Button Pressed");
+                #endif
             }
             lastDebounceTime = millis();
         }
@@ -199,9 +203,11 @@ void PollSensors()
     read_soil_moisture(soilMoisture);
     read_tank_levels(waterTank, fertilizerTank);
 
+    #ifdef DEBUG
     Serial.printf("Luminosity: %d \n", luminosity);
     Serial.printf("Humidity: %d \n", humidity);
     Serial.printf("Temperature: %d \n", temperature);
+    #endif
 }
 
 
