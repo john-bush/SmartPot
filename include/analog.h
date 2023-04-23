@@ -10,8 +10,9 @@
 
 
 
-int read_soil_moisture();
-int read_water_level_pins();
+void read_soil_moisture(int& soil_moisture);
+void read_tank_levels(int& pin1_val, int& pin2_val);
+
 
 
 void init_pumps();

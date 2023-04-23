@@ -2,16 +2,16 @@
 #include "Arduino.h"
 
 
-int read_soil_moisture(){
-  int soil_read = analogRead(SOIL_MOISTURE_PIN);
-  // Do operations
-  return soil_read;
+void read_soil_moisture(int& soil_moisture){
+    int raw_read = analogRead(SOIL_MOISTURE_PIN);
+    // Do operations
+    
+    soil_moisture = raw_read;
 }
 
-int read_water_level_pins(){
-  int pin1_val = analogRead(WATER_LEVEL_PIN_0);
-  return pin1_val;
-
+void read_tank_levels(int& pin1_val, int& pin2_val){
+    pin1_val = analogRead(WATER_LEVEL_PIN_0);
+    pin2_val = analogRead(WATER_LEVEL_PIN_1);
 } 
 
 

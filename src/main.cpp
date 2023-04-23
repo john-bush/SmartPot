@@ -5,7 +5,7 @@
 
 #include "analog.h"
 
-#define DEBUG 1
+// #define DEBUG
 
 float p = 3.1415926;
 
@@ -19,109 +19,79 @@ void setup(void)
     Serial.println("Initializing");
 
     ui.Init();
-    //ui.LoadingScreen();
+    // ui.LoadingScreen();
+    RetrievePastState();
+    delay(500);
 
 #ifndef DEBUG
     InitEncoder();
     i2c_init(BDIV);
-#endif
-
-    ui.ClearDisplay();
-    Serial.begin(9600);
-
-
     tsl.initialize();
-    init_pumps();
-
-    // Color(0, 0, 255);
-    // FillCircle(30);
-    // TestChart();
+#endif
 
 }
 
 
 void loop()
 {
-    ui.DrawTankScreen();
+    int entryState = state;
+    switch(state) {
+        
+        case 0: // Loading Screen
+            if (firstLoop) {
+                ui.LoadingScreen();
+                firstLoop = false;
+            }
+            break;
+        
+        case 1: // Tank Screen
+            if (firstLoop) {
+                ui.DrawTankScreen();
+                firstLoop = false;
+            }
 
-    delay(2000);
-    ui.UpdateTank(0, 1);
+            PollSensors();
+            ui.SetTank(waterTank, fertilizerTank);
+            if (waterTank && fertilizerTank) {
+                state = 2;
+                firstLoop = true;
+                ui.SetState(state);
+            }
+                
+            break;
+        case 2: // Plant Selection Screen
+            if (firstLoop) {
+                ui.DrawPlantSelectionScreen();
+                firstLoop = false;
+            }
+            // *updates and state change are handled by the button press and scroll interrupts          
+            break;
+        case 3: // Plant Confirmation Screen
+            if (firstLoop) {
+                ui.DrawPlantConfirmationScreen();
+                firstLoop = false;
+            }
+            break;
+        case 4: // Plant Dashboard
+            if (firstLoop) {
+                readIntFromEEPROM(8, plantType); // get plant type from EEPROM
+                ui.DrawPlantDashboard();
+                firstLoop = false;
+            }
+            PollSensors();
+            // send sensor data to Interface object
+            ui.UpdateSensors(temperature, humidity, luminosity, waterTank, fertilizerTank);
+            ui.UpdatePlantDashboard();
+            break;
+        default:
+            break;
+    }
 
-    delay(2000);
-    ui.UpdateTank(1, 1);
-
-    delay(2000);
-    ui.UpdateTank(0, 0);
-
-#ifndef DEBUG
-    uint32_t luminosity = tsl.rd_luminosity();
-    dht.full_measurement();
-    float humidity = dht.get_humidity();
-    float temperature = dht.get_temperature();
-
-    Serial.printf("Luminosity: %d \n", luminosity);
-    Serial.printf("Humidity: %d \n", humidity);
-    Serial.printf("Temperature: %d \n", temperature);
-#endif
-
-
-
-    delay(2000);
-    ui.UpdateTank(0, 0);
-
-    delay(2000);
-
-    
-    ui.DrawPlantSelectionScreen();
-    delay(2000);
-    ui.ScrollForward();
-    delay(2000);
-    ui.ScrollForward();
-    delay(2000);
-    ui.ScrollForward();
-    delay(2000);
-    ui.ScrollBackward();
-
-    ui.DrawPlantConfirmationScreen();
-    delay(2000);
-    ui.ScrollForward();
-    delay(2000);
-    ui.ScrollForward();
-    delay(2000);
-    ui.ScrollForward();
-    delay(2000);
-    ui.ScrollBackward();
-    delay(5000);
-
-
-    long luminosity = tsl.rd_luminosity();
-    dht.full_measurement();
-    float humidity = dht.get_humidity();
-    float temperature = dht.get_temperature();
-
-    #ifndef DEBUG
-    Serial.printf("Luminosity: %ld \n", luminosity);
-    Serial.printf("Humidity: %d \n", int(humidity));
-    Serial.printf("Temperature: %d \n", int(temperature));
-    Serial.printf("Soil Level Moisture: %d \n", read_soil_moisture());
-    Serial.printf("Water Level: %d \n", read_water_level_pins());
-    #endif
-
-    ui.DrawPlantDashboard();
-    
-
-    delay(2000);
-    ui.SetTank(1, 0);
-    ui.UpdatePlantDashboard();
-
-    delay(2000);
-    ui.SetTank(1, 1);
-    ui.UpdatePlantDashboard();
-
-    delay(2000);
-    ui.SetTank(0, 1);
-    ui.UpdatePlantDashboard();
-
+    if (state != entryState) {
+        firstLoop = true;
+        writeIntIntoEEPROM(4, state);
+        
+    }
 }
 
 void encoderISR()
@@ -180,6 +150,12 @@ void buttonISR()
             if (buttonState == LOW)
             {
                 // call UI update function
+                ui.ButtonPress();
+                int oldState = state;
+                state = ui.GetState(); // update state based on UI
+                if (oldState != state) {
+                    firstLoop = true;
+                }
                 Serial.println("Button Pressed");
             }
             lastDebounceTime = millis();
@@ -211,4 +187,29 @@ ISR(PCINT2_vect)
   encoderISR();
 
 
+}
+
+void PollSensors() 
+{
+    luminosity = tsl.rd_luminosity();
+    dht.full_measurement();
+    humidity = dht.get_humidity();
+    temperature = dht.get_temperature();
+
+    read_soil_moisture(soilMoisture);
+    read_tank_levels(waterTank, fertilizerTank);
+
+    Serial.printf("Luminosity: %d \n", luminosity);
+    Serial.printf("Humidity: %d \n", humidity);
+    Serial.printf("Temperature: %d \n", temperature);
+}
+
+
+void RetrievePastState()
+{
+    readBoolFromEEPROM(0, configured);
+    readIntFromEEPROM(4, state);
+    if (configured) {
+        readIntFromEEPROM(8, plantType);
+    }
 }

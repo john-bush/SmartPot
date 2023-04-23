@@ -214,6 +214,15 @@ void Interface::UpdatePlantDashboard() {
     Display.FillCircle(10, Display.xsize*0.95, Display.ysize*0.2);
 }
 
+void Interface::UpdateSensors(float temperature, float humidity, float light, int tankLevel1, int tankLevel2) {
+    temperature_ = temperature;
+    humidity_ = humidity;
+    light_ = light;
+    this->tankLevel1 = tankLevel1;
+    this->tankLevel2 = tankLevel2;
+    UpdatePlantDashboard();
+}
+
 void Interface::ScrollForward() {
     switch (state) {
         case 2: // plant selection screen
@@ -245,35 +254,54 @@ void Interface::ScrollBackward() {
 void Interface::ButtonPress() {
     switch (state) {
         case 0: // loading screen
-            DrawTankScreen();
+            state = 1;
             break;
         case 1: // Tank screen
             // there is no user action at this screen.
             break;
         case 2: // plant selection screen
-            DrawPlantConfirmationScreen();
+            state = 3;
             break;
         case 3: // plant confirmation screen
             if (confirmationButton) {
-                DrawPlantDashboard();
+                writeIntIntoEEPROM(0, currPlantHover);
+                state = 4;
+                // DrawPlantDashboard();
             } else {
-                DrawPlantSelectionScreen();
+                state = 2;
+                // DrawPlantSelectionScreen();
             }
             break;
     }
 }
 
 void Interface::SetTank(int tank1, int tank2) {
+    bool updateDashboard = false;
     if (tank1 != tankLevel1) {
         tankLevel1 = tank1;
         if (state == 1) {
             UpdateTank(1, tankLevel1);
+        } else if (state == 4) {
+            updateDashboard = true;
         }
     }
     if (tank2 != tankLevel2) {
         tankLevel2 = tank2;
         if (state == 1) {
             UpdateTank(2, tankLevel2);
+        } else if (state == 4) {
+            updateDashboard = true;
         }
     }
+    if (updateDashboard) {
+        UpdatePlantDashboard();
+    }
+}
+
+int Interface::GetState() {
+    return state;
+}
+
+int Interface::SetState(int newState) {
+    state = newState;
 }

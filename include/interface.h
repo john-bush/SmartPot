@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "tft_display_lib.h"
+#include "util.h"
 
 class Interface : public TFTDisplay
 {
@@ -32,9 +33,12 @@ class Interface : public TFTDisplay
         void ScrollBackward();
         void ButtonPress();
 
-        void PollSensors();
+        void UpdateSensors(float temperature, float humidity, float light, int tankLevel1, int tankLevel2);
 
         void SetTank(int tank1, int tank2);
+
+        int GetState();
+        int SetState(int newState);
     
     private:
         int state = 0; // general state variable

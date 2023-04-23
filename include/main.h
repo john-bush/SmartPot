@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util.h"
 #include "tft_display_lib.h"
 #include "interface.h"
 // #include <Adafruit_GFX.h>    // Core graphics library
@@ -31,4 +32,24 @@ const unsigned long debounceDelay = 50;
 void encoderISR();
 void buttonISR();
 void InitEncoder();
+
+void PollSensors();
+
+void RetrievePastState();
+
+// persistent state variables
+bool configured = false; // true if the user has configured the system
+int state = 0; // general state variable
+bool firstLoop = true; // true if this is the first loop in that state
+int plantType = -1; // the type of plant that the user has selected (is -1 if not configured)
+
+// sensor variables
+uint32_t luminosity = 0;
+float humidity = 0;
+float temperature = 0;
+int soilMoisture = 0;
+int waterTank = false;
+int fertilizerTank = false;
+
+
 /**************************************************************************/
