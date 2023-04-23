@@ -10,11 +10,8 @@
 float p = 3.1415926;
 
 Interface ui = Interface();
-
-#ifndef DEBUG
-    DHT20 dht = DHT20();
-    TSL2591 tsl = TSL2591();
-#endif
+DHT20 dht = DHT20();
+TSL2591 tsl = TSL2591();
 
 void setup(void)
 {
@@ -34,6 +31,7 @@ void setup(void)
 
 
     tsl.initialize();
+    init_pumps();
 
     // Color(0, 0, 255);
     // FillCircle(30);
@@ -101,12 +99,13 @@ void loop()
     float humidity = dht.get_humidity();
     float temperature = dht.get_temperature();
 
-
+    #ifndef DEBUG
     Serial.printf("Luminosity: %ld \n", luminosity);
     Serial.printf("Humidity: %d \n", int(humidity));
     Serial.printf("Temperature: %d \n", int(temperature));
     Serial.printf("Soil Level Moisture: %d \n", read_soil_moisture());
     Serial.printf("Water Level: %d \n", read_water_level_pins());
+    #endif
 
     ui.DrawPlantDashboard();
     
@@ -160,8 +159,10 @@ void encoderISR()
                 ui.ScrollBackward();
             }
         }
+        #ifndef DEBUG
         Serial.print("Encoder count: ");
         Serial.println(encoderCount);
+        #endif
         lastEncoderState = encoderState;
     }
 }

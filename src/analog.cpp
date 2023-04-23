@@ -14,12 +14,26 @@ int read_water_level_pins(){
 
 } 
 
-void init_pump(){
-  pinMode(PUMP_PIN_0, OUTPUT);
+
+// Water and fertilizer Pumps
+
+void init_pumps(){
+  pinMode(WATER_PUMP_PIN, OUTPUT);
+  pinMode(FERTILIZER_PUMP_PIN, OUTPUT);
 }
 
-void turn_on_pump(){
-  digitalWrite(PUMP_PIN_0, HIGH);
-  delay(100);
-  //digitalWrite(PUMP_PIN_0, LOW);
+void turn_on_water_pump(){
+  digitalWrite(WATER_PUMP_PIN, HIGH);
+}
+
+void turn_off_water_pump(){
+  digitalWrite(WATER_PUMP_PIN, LOW);
+}
+
+void turn_on_fertilizer_pump(){
+  digitalWrite(FERTILIZER_PUMP_PIN, HIGH);
+}
+
+void turn_off_fertilizer_pump(){
+  digitalWrite(FERTILIZER_PUMP_PIN, LOW);
 }
