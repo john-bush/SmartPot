@@ -159,8 +159,8 @@ void Interface::DrawPlantDashboard() {
     state = 4;
     Display.FillScreen(Display.Green);
     Display.PlotTextCentered(PSTR("Your Plant Dashboard"), Display.xsize>>1, Display.ysize*0.9, 2, true);
-    Display.DrawImage(plantPtr[currPlantHover], 30, 30, Display.xsize*0.8, Display.ysize*0.6, false, 2);
-    Display.PlotTextCentered(plantNames[currPlantHover], Display.xsize*0.8, Display.ysize*0.35, 2, 12);
+    Display.DrawImage(plantPtr[plantSelection], 30, 30, Display.xsize*0.8, Display.ysize*0.6, false, 2);
+    Display.PlotTextCentered(plantNames[plantSelection], Display.xsize*0.8, Display.ysize*0.35, 2, 12);
 
 
     // show temperature
@@ -264,7 +264,8 @@ void Interface::ButtonPress() {
             break;
         case 3: // plant confirmation screen
             if (confirmationButton) {
-                writeIntIntoEEPROM(0, currPlantHover);
+                plantSelection = currPlantHover;
+                writeIntIntoEEPROM(0, plantSelection);
                 state = 4;
                 // DrawPlantDashboard();
             } else {
@@ -304,4 +305,8 @@ int Interface::GetState() {
 
 int Interface::SetState(int newState) {
     state = newState;
+}
+
+void Interface::SetPlantType(int plantType) {
+    plantSelection = plantType;
 }

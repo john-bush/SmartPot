@@ -211,5 +211,6 @@ void RetrievePastState()
     readIntFromEEPROM(4, state);
     if (configured) {
         readIntFromEEPROM(8, plantType);
+        ui.SetPlantType(plantType);
     }
 }
