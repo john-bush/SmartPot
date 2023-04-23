@@ -78,6 +78,7 @@ class TFTDisplay {
         */
         void PlotTextCentered(PGM_P p, int x, int y, int scale_, bool background = true);
         void PlotTextCentered(const char* str, int centerX, int centerY, int scale_, int color);
+        void PlotTextLeftAligned(PGM_P p, int x, int y, int scale_, bool background = true);
         void PlotInt(int n);
         void TestChart ();
         void BarChart ();

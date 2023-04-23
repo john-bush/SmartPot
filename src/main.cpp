@@ -5,30 +5,40 @@
 
 #include "analog.h"
 
+#define DEBUG 1
+
 float p = 3.1415926;
 
 Interface ui = Interface();
-DHT20 dht = DHT20();
-TSL2591 tsl = TSL2591();
+
+#ifndef DEBUG
+    DHT20 dht = DHT20();
+    TSL2591 tsl = TSL2591();
+#endif
 
 void setup(void)
 {
     Serial.begin(9600);
     Serial.println("Initializing");
-    InitEncoder();
+
     ui.Init();
     //ui.LoadingScreen();
 
+#ifndef DEBUG
+    InitEncoder();
     i2c_init(BDIV);
+#endif
+
     ui.ClearDisplay();
     Serial.begin(9600);
 
-    tsl.initialize();
 
+    tsl.initialize();
 
     // Color(0, 0, 255);
     // FillCircle(30);
     // TestChart();
+
 }
 
 
@@ -45,8 +55,16 @@ void loop()
     delay(2000);
     ui.UpdateTank(0, 0);
 
-    delay(1000);
-    ui.ClearDisplay();
+#ifndef DEBUG
+    uint32_t luminosity = tsl.rd_luminosity();
+    dht.full_measurement();
+    float humidity = dht.get_humidity();
+    float temperature = dht.get_temperature();
+
+    Serial.printf("Luminosity: %d \n", luminosity);
+    Serial.printf("Humidity: %d \n", humidity);
+    Serial.printf("Temperature: %d \n", temperature);
+#endif
 
 
 
@@ -77,6 +95,7 @@ void loop()
     ui.ScrollBackward();
     delay(5000);
 
+
     long luminosity = tsl.rd_luminosity();
     dht.full_measurement();
     float humidity = dht.get_humidity();
@@ -88,6 +107,22 @@ void loop()
     Serial.printf("Temperature: %d \n", int(temperature));
     Serial.printf("Soil Level Moisture: %d \n", read_soil_moisture());
     Serial.printf("Water Level: %d \n", read_water_level_pins());
+
+    ui.DrawPlantDashboard();
+    
+
+    delay(2000);
+    ui.SetTank(1, 0);
+    ui.UpdatePlantDashboard();
+
+    delay(2000);
+    ui.SetTank(1, 1);
+    ui.UpdatePlantDashboard();
+
+    delay(2000);
+    ui.SetTank(0, 1);
+    ui.UpdatePlantDashboard();
+
 }
 
 void encoderISR()

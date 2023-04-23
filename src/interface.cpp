@@ -9,6 +9,7 @@ void Interface::Init() {
     plantNames[1] = "Leafy Plant ";
     plantNames[2] = "  Cactus    ";
     plantNames[3] = "  Flowers   ";
+
 }
 
 void Interface::LoadingScreen() {
@@ -100,7 +101,7 @@ void Interface::UpdatePlantSelectionScreen() {
         // update plant icons if scroll changes
         if (scrollOffset != offset) {
             Display.DrawImage(plantPtr[index], 30, 30, x, image_y, false, 2);
-            Display.PlotTextCentered(plantNames[index], x, Display.ysize*0.25, 1, 1);
+            Display.PlotTextCentered(plantNames[index], x, Display.ysize*0.25, 1, 12);
         }
         
     }
@@ -124,7 +125,7 @@ void Interface::DrawPlantConfirmationScreen() {
     Display.FillScreen(Display.Green);
     Display.PlotTextCentered(PSTR("Confirm Plant Type"), Display.xsize>>1, Display.ysize*0.85, 2, true);
     Display.DrawImage(plantPtr[currPlantHover], 30, 30, Display.xsize>>1, Display.ysize*0.6, false, 2);
-    Display.PlotTextCentered(plantNames[currPlantHover], Display.xsize>>1, Display.ysize*0.35, 2, 1);
+    Display.PlotTextCentered(plantNames[currPlantHover], Display.xsize>>1, Display.ysize*0.35, 2, 12);
     
     Display.DrawImage(left_arrow, 25, 25, Display.xsize * 0.1, Display.ysize*0.2, false);
     Display.PlotTextCentered(PSTR("return"), Display.xsize*0.3, Display.ysize*0.2, 1);
@@ -157,21 +158,60 @@ void Interface::UpdatePlantConfirmationScreen() {
 void Interface::DrawPlantDashboard() {
     state = 4;
     Display.FillScreen(Display.Green);
-    Display.PlotTextCentered(PSTR("Your Plant Dashboard"), Display.xsize>>1, Display.ysize*0.8, 3, true);
-    Display.DrawImage(plantPtr[currPlantHover], 30, 30, Display.xsize>>1, Display.ysize*0.6, false);
-    Display.PlotTextCentered(plantNames[currPlantHover], Display.xsize>>1, Display.ysize*0.35, 2);
-    
-    Display.DrawImage(left_arrow, 25, 25, Display.xsize * 0.2, Display.ysize*0.2, false);
-    Display.PlotTextCentered(PSTR("return"), Display.xsize*0.3, Display.ysize*0.2, 1);
+    Display.PlotTextCentered(PSTR("Your Plant Dashboard"), Display.xsize>>1, Display.ysize*0.9, 2, true);
+    Display.DrawImage(plantPtr[currPlantHover], 30, 30, Display.xsize*0.8, Display.ysize*0.6, false, 2);
+    Display.PlotTextCentered(plantNames[currPlantHover], Display.xsize*0.8, Display.ysize*0.35, 2, 12);
 
-    Display.DrawImage(left_arrow, 25, 25, Display.xsize * 0.8, Display.ysize*0.2, true);
-    Display.PlotTextCentered(PSTR("confirm"), Display.xsize * 0.7, Display.ysize*0.2, 1);
+
+    // show temperature
+    Display.PlotTextLeftAligned(PSTR("Temp:     "), Display.xsize * 0.05, Display.ysize*0.7, 2, true);
+
+    // show humidity
+    Display.PlotTextLeftAligned(PSTR("Humidity: "), Display.xsize * 0.05, Display.ysize*0.6, 2, true);
+
+    // show light level
+    Display.PlotTextLeftAligned(PSTR("Light:    "), Display.xsize * 0.05, Display.ysize*0.5, 2, true);
+
+    // Water Tank
+    Display.PlotTextCentered(PSTR("Water"), Display.xsize*0.2, Display.ysize*0.15, 2, true);
+
+    // Fertilizer Tank
+    Display.PlotTextCentered(PSTR("Fertilizer"), Display.xsize*0.67, Display.ysize*0.15, 2, true);
 
     UpdatePlantDashboard();
 }
 
 void Interface::UpdatePlantDashboard() {
+    char buffer[10];
+    
+    // Update Temperature
+    dtostrf(temperature_, 4, 3, buffer);
+    Display.PlotTextCentered(buffer, Display.xsize * 0.5, Display.ysize*0.7+6, 2, 5);
 
+    // Update Humidity
+    dtostrf(humidity_, 4, 3, buffer);
+    Display.PlotTextCentered(buffer, Display.xsize * 0.5, Display.ysize*0.6+6, 2, 5);
+
+    // Update Light Level
+    dtostrf(light_, 4, 3, buffer);
+    Serial.println(buffer);
+    Display.PlotTextCentered(buffer, Display.xsize * 0.5, Display.ysize*0.5+6, 2, 5);
+    
+    // Update Water Tank Indicator
+    if (tankLevel1 == 1) {
+        Display.SetForeColor(66, 135, 245);
+    } else {
+        Display.SetForeColor(209, 4, 4);
+    }
+    Display.FillCircle(10, Display.xsize*0.4, Display.ysize*0.2);
+
+    // Update Fertilizer Tank Indicator
+    if (tankLevel2 == 1) {
+        Display.SetForeColor(66, 135, 245);
+    } else {
+        Display.SetForeColor(209, 4, 4);
+    }
+    Display.FillCircle(10, Display.xsize*0.95, Display.ysize*0.2);
 }
 
 void Interface::ScrollForward() {
@@ -220,5 +260,20 @@ void Interface::ButtonPress() {
                 DrawPlantSelectionScreen();
             }
             break;
+    }
+}
+
+void Interface::SetTank(int tank1, int tank2) {
+    if (tank1 != tankLevel1) {
+        tankLevel1 = tank1;
+        if (state == 1) {
+            UpdateTank(1, tankLevel1);
+        }
+    }
+    if (tank2 != tankLevel2) {
+        tankLevel2 = tank2;
+        if (state == 1) {
+            UpdateTank(2, tankLevel2);
+        }
     }
 }
