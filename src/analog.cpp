@@ -13,3 +13,13 @@ int read_water_level_pins(){
   return pin1_val;
 
 } 
+
+void init_pump(){
+  pinMode(PUMP_PIN_0, OUTPUT);
+}
+
+void turn_on_pump(){
+  digitalWrite(PUMP_PIN_0, HIGH);
+  delay(100);
+  //digitalWrite(PUMP_PIN_0, LOW);
+}

@@ -32,6 +32,13 @@ void setup(void)
     ui.ClearDisplay();
     Serial.begin(9600);
 
+
+    tsl.initialize();
+
+    // Color(0, 0, 255);
+    // FillCircle(30);
+    // TestChart();
+
 }
 
 
@@ -88,6 +95,19 @@ void loop()
     ui.ScrollBackward();
     delay(5000);
 
+
+    long luminosity = tsl.rd_luminosity();
+    dht.full_measurement();
+    float humidity = dht.get_humidity();
+    float temperature = dht.get_temperature();
+
+
+    Serial.printf("Luminosity: %ld \n", luminosity);
+    Serial.printf("Humidity: %d \n", int(humidity));
+    Serial.printf("Temperature: %d \n", int(temperature));
+    Serial.printf("Soil Level Moisture: %d \n", read_soil_moisture());
+    Serial.printf("Water Level: %d \n", read_water_level_pins());
+
     ui.DrawPlantDashboard();
     
 
@@ -102,6 +122,7 @@ void loop()
     delay(2000);
     ui.SetTank(0, 1);
     ui.UpdatePlantDashboard();
+
 }
 
 void encoderISR()
