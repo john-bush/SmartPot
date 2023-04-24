@@ -62,7 +62,7 @@ float idealTemperature = 0;
 int idealLuminosity = 0;
 int idealSoilMoisture = 0;
 
-#define DT 0.001
+#define DT 0.1
 // plant care integral variables
 char* response1;
 char* response2;
@@ -83,16 +83,15 @@ int humidityThreshold = 10;
 int temperatureThreshold = 10;
 int luminosityThreshold = 100;
 
-// timing variables
+// watering variables
+bool watering = false;  
+bool fertilizing = false;
+int amountOfWater = 2000;
+int wateringTimeout = 10000;
+int fertilizerTimeout = 100000;
 unsigned long startTime = 0;
 unsigned long lastWater = 0;
 unsigned long lastFertilizer = 0;
-unsigned long humidityCounter0 = 0;
-unsigned long humidityCounter1 = 0;
-unsigned long temperatureCounter0 = 0;
-unsigned long temperatureCounter1 = 0;
-unsigned long luminosityCounter0 = 0;
-unsigned long luminosityCounter1 = 0;
 unsigned long curr_time = 0;
 
 int plantLight = 0;

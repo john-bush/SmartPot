@@ -40,6 +40,9 @@ class Interface : public TFTDisplay
         int GetState();
         void SetState(int newState);
         void SetPlantType(int plantType);
+
+        void SendStatus(char* message1, char* message2);
+    
     
     private:
         int state = 0; // general state variable

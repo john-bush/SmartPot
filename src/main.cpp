@@ -17,7 +17,6 @@ void setup(void)
 {
 #ifdef DEBUG
     Serial.begin(9600);
-    #ifdef DEBUG
     Serial.println("Initializing");
 #endif
     ui.Init();
@@ -31,8 +30,8 @@ void setup(void)
     i2c_init(BDIV);
     tsl.initialize();
 #endif
-    response1 = new char[20];
-    response2 = new char[20];
+    response1 = new char[18];
+    response2 = new char[18];
 }
 
 
@@ -61,12 +60,16 @@ void loop()
 
             PollSensors();
             ui.SetTank(waterTank, fertilizerTank);
+            delay(500); // allows for screen refresh
+
             if (waterTank && fertilizerTank) {
                 // prime water pumps
                 turn_on_water_pump();
-                turn_on_fertilizer_pump();
-                delay(2000);
+                delay(1000);
                 turn_off_water_pump();
+                delay(500);
+                turn_on_fertilizer_pump();
+                delay(1000);
                 turn_off_fertilizer_pump();
                 state = 2;
                 firstLoop = true;
@@ -107,7 +110,7 @@ void loop()
             }
             PollSensors();
             // send sensor data to Interface object
-            // PlantCare();
+            PlantCare();
             ui.UpdateSensors(temperature, humidity, luminosity, waterTank, fertilizerTank);
             ui.UpdatePlantDashboard();
             break;
@@ -147,20 +150,67 @@ char* PlantCare() {
     previousSoilMoisture = adjustedSoilMoisture;
 
     // *** CONTROL *** //
-    if (soilMoistureIntegral > soilMoistureThreshold || soilMoistureIntegral < -soilMoistureThreshold) {
-        // signal to raise soil moisture of plant
+    if (!watering) { // check if we need to water the plant
+        if (soilMoistureIntegral > soilMoistureThreshold) {
+            // signal to raise soil moisture of plant
+            unsigned long curr_time = millis();
+            // start watering
+            if ((curr_time - lastFertilizer > fertilizerTimeout) && fertilizerTank) { // check if plant needs fertilizer
+                startTime = curr_time;
+                fertilizing = true;
+                turn_on_fertilizer_pump();
+            } else if ((curr_time - lastFertilizer > wateringTimeout) && waterTank) { // check if plant needs water
+                startTime = curr_time;
+                watering = true;
+                turn_on_water_pump();
+            }
+        }
+    } else { // check if end of watering
+        if (fertilizing) {
+            unsigned long curr_time = millis();
+            if ((curr_time - startTime > amountOfWater) || !fertilizerTank) {
+                turn_off_fertilizer_pump();
+                fertilizing = false;
+                lastWater = curr_time;
+                lastFertilizer = curr_time;
+            }
+        } else if (watering) {
+            unsigned long curr_time = millis();
+            if ((curr_time - startTime > amountOfWater) || !waterTank) {
+                turn_off_water_pump();
+                watering = false;
+                lastWater = curr_time;
+            }
+        }
     }
     
-    if (luminosityIntegral > luminosityThreshold || luminosityIntegral < -luminosityThreshold) {
+    if (luminosityIntegral > luminosityThreshold) {
         // signal to raise luminosity of plant
         strcpy(response1, "your plant needs");
-        strcpy(response2, "more light");
-    } else if (temperatureIntegral > temperatureThreshold || temperatureIntegral < -temperatureThreshold) {
+        strcpy(response2, "less light      ");
+    } else if (luminosityIntegral < -luminosityThreshold) {
+        // signal to lower luminosity of plant
+        strcpy(response1, "your plant needs");
+        strcpy(response2, "more light      ");
+    } else if (temperatureIntegral > temperatureThreshold) {
         // signal to raise temperature of plant
-        strcpy(response1, "temperature");
-    } else if (humidityIntegral > humidityThreshold || humidityIntegral < -humidityThreshold) {
-        strcpy(response1, "humidity");
+        strcpy(response1, "your plant needs");
+        strcpy(response2, "less heat       ");
+    } else if (temperatureIntegral < -temperatureThreshold) {
+        strcpy(response1, "your plant needs");
+        strcpy(response2, "more heat       ");
+    } else if (humidityIntegral > humidityThreshold) {
+        strcpy(response1, "your plant needs");
+        strcpy(response2, "less humidity   ");
+    } else if (humidityIntegral < -humidityThreshold) {
+        strcpy(response1, "your plant needs");
+        strcpy(response2, "more humidity   ");
+    } else {
+        strcpy(response1, "your plant is   ");
+        strcpy(response2, "healthy         ");
     }
+
+    ui.SendStatus(response1, response2);
 
 }
 
@@ -199,7 +249,6 @@ void encoderISR()
                 ui.ScrollForward();
             }
         }
-        #ifdef DEBUG
         #ifdef DEBUG
         Serial.print("Encoder count: ");
         Serial.println(encoderCount);
