@@ -272,6 +272,9 @@ int Interface::ButtonPress() {
                 // DrawPlantSelectionScreen();
             }
             break;
+        case 4:
+            state = 0;
+            break;
     }
     return state;
 }
@@ -281,7 +284,7 @@ void Interface::SetTank(int tank1, int tank2) {
     if (tank1 != tankLevel1) {
         tankLevel1 = tank1;
         if (state == 1) {
-            UpdateTank(1, tankLevel1);
+            UpdateTank(0, tankLevel1);
         } else if (state == 4) {
             updateDashboard = true;
         }
@@ -289,7 +292,7 @@ void Interface::SetTank(int tank1, int tank2) {
     if (tank2 != tankLevel2) {
         tankLevel2 = tank2;
         if (state == 1) {
-            UpdateTank(2, tankLevel2);
+            UpdateTank(1, tankLevel2);
         } else if (state == 4) {
             updateDashboard = true;
         }
@@ -313,8 +316,8 @@ void Interface::SetPlantType(int plantType) {
 
 void Interface::SendStatus(char* message1, char* message2, char* message3) {
     if (state == 4) {
-        Display.PlotTextCentered(message1, Display.xsize*0.25, Display.ysize*0.45, 2, 11);
-        Display.PlotTextCentered(message2, Display.xsize*0.25, Display.ysize*0.35, 2, 11);
-        Display.PlotTextCentered(message3, Display.xsize*0.25, Display.ysize*0.25, 2, 11);
+        Display.PlotTextCentered(message1, Display.xsize*0.25, Display.ysize*0.5, 2, 11);
+        Display.PlotTextCentered(message2, Display.xsize*0.25, Display.ysize*0.4, 2, 11);
+        Display.PlotTextCentered(message3, Display.xsize*0.25, Display.ysize*0.3, 2, 11);
     }
 }

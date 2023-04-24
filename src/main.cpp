@@ -41,21 +41,15 @@ void setup(void)
 
 void loop()
 {
-    int entryState = state;
-    stateChange = false;
+    buttonPressed = false;
+    
     switch(state) {
         
-        case 0: // Loading Screen
-            if (stateChange) break;
-
-            if (firstLoop ) {
-                //ui.LoadingScreen();
-                firstLoop = false;
-            }
+        case 0: // Loading Screen (do nothing)
             break;
         
         case 1: // Tank Screen
-            if (stateChange) break;
+            if (buttonPressed) break;
             
             if (firstLoop) {
                 ui.DrawTankScreen();
@@ -76,14 +70,16 @@ void loop()
                 delay(1000);
                 turn_off_fertilizer_pump();
                 state = 2;
+                writeIntIntoEEPROM(4, state);
                 firstLoop = true;
+                buttonPressed = false;
                 ui.SetState(state);
                 delay(2000);
             }
                 
             break;
         case 2: // Plant Selection Screen
-            if (stateChange) break;
+            if (buttonPressed) break;
 
             if (firstLoop) {
                 ui.DrawPlantSelectionScreen();
@@ -92,7 +88,7 @@ void loop()
             // *updates and state change are handled by the button press and scroll interrupts          
             break;
         case 3: // Plant Confirmation Screen
-            if (stateChange) break;
+            if (buttonPressed) break;
 
             if (firstLoop) {
                 ui.DrawPlantConfirmationScreen();
@@ -100,7 +96,7 @@ void loop()
             }
             break;
         case 4: // Plant Dashboard
-            if (stateChange) break;
+            if (buttonPressed) break;
 
             if (firstLoop) {
                 readIntFromEEPROM(8, plantType); // get plant type from EEPROM
@@ -115,7 +111,7 @@ void loop()
             PollSensors();
             // send sensor data to Interface object
             PlantCare();
-            ui.UpdateSensors(soilMoisture, soilMoistureIntegral, luminosity, waterTank, fertilizerTank);
+            ui.UpdateSensors(temperature, humidity, luminosity, waterTank, fertilizerTank);
             ui.UpdatePlantDashboard();
             break;
         default:
@@ -123,18 +119,17 @@ void loop()
             break;
     }
 
-    if (state != entryState) {
+    delay(200);
+
+    if (buttonPressed) {
+        // if (state != 2) {
+        //     state = ui.ButtonPress();
+        // }
+        state = ui.ButtonPress();
+        buttonPressed = false;
         firstLoop = true;
         writeIntIntoEEPROM(4, state);
-        
     }
-
-    if (stateChange) {
-        state = ui.ButtonPress();
-        stateChange = false;
-        firstLoop = true;
-    }
-
 }
 
 char* PlantCare() {
@@ -161,7 +156,7 @@ char* PlantCare() {
 
     // *** CONTROL *** //
     if (!watering) { // check if we need to water the plant
-        if (soilMoistureIntegral > soilMoistureThreshold || soilMoistureIntegral < -soilMoistureThreshold) {
+        if (soilMoistureIntegral > soilMoistureThreshold) {
             // signal to raise soil moisture of plant
             unsigned long curr_time = millis();
             // start watering
@@ -281,11 +276,7 @@ void buttonISR()
             if (buttonState == LOW)
             {
                 // call UI update function
-                stateChange = true;
-                // state = ui.GetState(); // update state based on UI
-                #ifdef DEBUG
-                Serial.println("Button Pressed");
-                #endif
+                buttonPressed = true;            
             }
             lastDebounceTime = millis();
         }

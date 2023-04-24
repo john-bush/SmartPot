@@ -22,7 +22,7 @@ volatile int encoderState = 0;
 volatile int lastEncoderState = 0;
 volatile int buttonState = 0;
 volatile int lastButtonState = 0;
-volatile bool stateChange = false;
+volatile bool buttonPressed = false;
 
 // Define variable for and encoder count
 volatile int encoderCount = 0;
