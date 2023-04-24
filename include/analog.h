@@ -11,7 +11,7 @@
 
 
 void read_soil_moisture(int& soil_moisture);
-void read_tank_levels(int& pin1_val, int& pin2_val);
+void read_tank_levels(bool& pin1_val, bool& pin2_val);
 
 
 

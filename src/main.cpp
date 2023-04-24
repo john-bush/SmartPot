@@ -86,6 +86,7 @@ void loop()
             ui.UpdatePlantDashboard();
             break;
         default:
+            state = 0;
             break;
     }
 
@@ -121,14 +122,14 @@ void encoderISR()
         {
             encoderCount++;
             if(encoderCount %4 ==0){
-                ui.ScrollForward();
+                ui.ScrollBackward();
             }
         }
         else
         {
             encoderCount--;
             if(encoderCount %4 ==0){
-                ui.ScrollBackward();
+                ui.ScrollForward();
             }
         }
         #ifdef DEBUG

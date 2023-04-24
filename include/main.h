@@ -48,8 +48,8 @@ uint32_t luminosity = 0;
 float humidity = 0;
 float temperature = 0;
 int soilMoisture = 0;
-int waterTank = false;
-int fertilizerTank = false;
+bool waterTank = false;
+bool fertilizerTank = false;
 
 
 /**************************************************************************/

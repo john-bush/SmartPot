@@ -9,9 +9,9 @@ void read_soil_moisture(int& soil_moisture){
     soil_moisture = raw_read;
 }
 
-void read_tank_levels(int& pin1_val, int& pin2_val){
-    pin1_val = analogRead(WATER_LEVEL_PIN_0);
-    pin2_val = analogRead(WATER_LEVEL_PIN_1);
+void read_tank_levels(bool& pin1_val, bool& pin2_val){
+    pin1_val = (analogRead(WATER_LEVEL_PIN_0)  < 10);
+    pin2_val = (analogRead(WATER_LEVEL_PIN_1) < 10 );
 } 
 
 
