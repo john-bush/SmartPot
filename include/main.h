@@ -66,6 +66,7 @@ int idealSoilMoisture = 0;
 // plant care integral variables
 char* response1;
 char* response2;
+char* response3;
 float previousHumidity = 0;
 float previousTemperature = 0;
 int previousLuminosity = 0;
@@ -79,16 +80,16 @@ int soilMoistureIntegral = 0;
 
 // thresholds for plant care
 int soilMoistureThreshold = 40;
-int humidityThreshold = 10;
-int temperatureThreshold = 10;
-int luminosityThreshold = 100;
+int humidityThreshold = 100;
+int temperatureThreshold = 100;
+int luminosityThreshold = 1000;
 
 // watering variables
 bool watering = false;  
 bool fertilizing = false;
 int amountOfWater = 2000;
-int wateringTimeout = 10000;
-int fertilizerTimeout = 100000;
+unsigned int wateringTimeout = 10000;
+unsigned long fertilizerTimeout = 100000;
 unsigned long startTime = 0;
 unsigned long lastWater = 0;
 unsigned long lastFertilizer = 0;

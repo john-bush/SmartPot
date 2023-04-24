@@ -169,7 +169,7 @@ void Interface::DrawPlantDashboard() {
     Display.PlotTextLeftAligned(PSTR("Humidity: "), Display.xsize * 0.05, Display.ysize*0.6, 2, true);
 
     // show light level
-    Display.PlotTextLeftAligned(PSTR("Message:    "), Display.xsize * 0.05, Display.ysize*0.5, 2, true);
+    //Display.PlotTextLeftAligned(PSTR("Message:    "), Display.xsize * 0.05, Display.ysize*0.5, 2, true);
 
     // Water Tank
     Display.PlotTextCentered(PSTR("Water"), Display.xsize*0.2, Display.ysize*0.15, 2, true);
@@ -194,6 +194,7 @@ void Interface::UpdatePlantDashboard() {
     // // Update Light Level
     // dtostrf(light_, 4, 3, buffer);
     // Display.PlotTextCentered(buffer, Display.xsize * 0.5, Display.ysize*0.5+6, 2, 5);
+
     
     // Update Water Tank Indicator
     if (tankLevel1 == 1) {
@@ -310,9 +311,10 @@ void Interface::SetPlantType(int plantType) {
     plantSelection = plantType;
 }
 
-void Interface::SendStatus(char* message1, char* message2) {
+void Interface::SendStatus(char* message1, char* message2, char* message3) {
     if (state == 4) {
-        Display.PlotTextCentered(message1, Display.xsize*0.25, Display.ysize*0.45, 2, 17);
-        Display.PlotTextCentered(message2, Display.xsize*0.25, Display.ysize*0.35, 2, 17);
+        Display.PlotTextCentered(message1, Display.xsize*0.25, Display.ysize*0.45, 2, 11);
+        Display.PlotTextCentered(message2, Display.xsize*0.25, Display.ysize*0.35, 2, 11);
+        Display.PlotTextCentered(message3, Display.xsize*0.25, Display.ysize*0.25, 2, 11);
     }
 }

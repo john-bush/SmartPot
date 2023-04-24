@@ -20,7 +20,7 @@ void setup(void)
     Serial.println("Initializing");
 #endif
     ui.Init();
-    // ui.LoadingScreen();
+    ui.LoadingScreen();
     RetrievePastState();
     delay(500);
 
@@ -30,8 +30,12 @@ void setup(void)
     i2c_init(BDIV);
     tsl.initialize();
 #endif
-    response1 = new char[18];
-    response2 = new char[18];
+    response1 = new char[12];
+    response2 = new char[12];
+    response3 = new char[12];
+    memset(response1, '\0',12);
+    memset(response2, '\0',12);
+    memset(response3, '\0',12);
 }
 
 
@@ -45,7 +49,7 @@ void loop()
             if (stateChange) break;
 
             if (firstLoop ) {
-                ui.LoadingScreen();
+                //ui.LoadingScreen();
                 firstLoop = false;
             }
             break;
@@ -104,14 +108,14 @@ void loop()
                 firstLoop = false;
 
                 idealHumidity = 40 + 2 * plantType;
-                idealLuminosity = 1000 - 100 * plantType;
+                idealLuminosity = 3000 - 100 * plantType;
                 idealSoilMoisture = 550 - 30 * plantType;
                 idealTemperature = 25 - plantType;
             }
             PollSensors();
             // send sensor data to Interface object
             PlantCare();
-            ui.UpdateSensors(temperature, humidity, luminosity, waterTank, fertilizerTank);
+            ui.UpdateSensors(soilMoisture, soilMoistureIntegral, luminosity, waterTank, fertilizerTank);
             ui.UpdatePlantDashboard();
             break;
         default:
@@ -130,23 +134,23 @@ void loop()
 char* PlantCare() {
     // *** CALCULATIONS *** //
     // temperature integral
-    float adjustedTemperature = temperature - idealTemperature;
-    temperatureIntegral += (adjustedTemperature - previousHumidity) * DT * 0.5;
+    float adjustedTemperature = temperature; //- idealTemperature;
+    temperatureIntegral += (adjustedTemperature + previousHumidity) * DT * 0.5;
     previousTemperature = adjustedTemperature;
     
     // humidity integral
     float adjustedHumidity = humidity - idealHumidity;
-    humidityIntegral += (adjustedHumidity - previousHumidity) * DT * 0.5;
+    humidityIntegral += (adjustedHumidity + previousHumidity) * DT * 0.5;
     previousHumidity = adjustedHumidity;
     
     // luminosity integral
     int adjustedLuminosity = luminosity - idealLuminosity;
-    luminosityIntegral += (adjustedLuminosity - previousLuminosity) * DT * 0.5;
+    luminosityIntegral += (adjustedLuminosity + previousLuminosity) * DT * 0.5;
     previousLuminosity = adjustedLuminosity;
 
     // soil moisture integral
     int adjustedSoilMoisture = soilMoisture - idealSoilMoisture;
-    soilMoistureIntegral += (adjustedSoilMoisture - previousSoilMoisture) * DT * 0.5;
+    soilMoistureIntegral += (adjustedSoilMoisture + previousSoilMoisture) * DT * 0.5;
     previousSoilMoisture = adjustedSoilMoisture;
 
     // *** CONTROL *** //
@@ -183,34 +187,35 @@ char* PlantCare() {
             }
         }
     }
-    
+
+    strcpy(response1, "your plant ");
     if (luminosityIntegral > luminosityThreshold) {
         // signal to raise luminosity of plant
-        strcpy(response1, "your plant needs");
-        strcpy(response2, "less light      ");
+        strcpy(response2, "needs less ");
+        strcpy(response3, "light      ");
     } else if (luminosityIntegral < -luminosityThreshold) {
         // signal to lower luminosity of plant
-        strcpy(response1, "your plant needs");
-        strcpy(response2, "more light      ");
+        strcpy(response2, "needs more ");
+        strcpy(response3, "   light   ");
     } else if (temperatureIntegral > temperatureThreshold) {
         // signal to raise temperature of plant
-        strcpy(response1, "your plant needs");
-        strcpy(response2, "less heat       ");
+        strcpy(response2, "needs less ");
+        strcpy(response3, "   heat    ");
     } else if (temperatureIntegral < -temperatureThreshold) {
-        strcpy(response1, "your plant needs");
-        strcpy(response2, "more heat       ");
+        strcpy(response2, "needs more ");
+        strcpy(response3, "   heat    ");
     } else if (humidityIntegral > humidityThreshold) {
-        strcpy(response1, "your plant needs");
-        strcpy(response2, "less humidity   ");
+        strcpy(response2, "needs less ");
+        strcpy(response3, " humidity  ");
     } else if (humidityIntegral < -humidityThreshold) {
-        strcpy(response1, "your plant needs");
-        strcpy(response2, "more humidity   ");
+        strcpy(response2, "needs more ");
+        strcpy(response3, " humidity  ");
     } else {
-        strcpy(response1, "your plant is   ");
-        strcpy(response2, "healthy         ");
+        strcpy(response2, "is healthy ");
+        strcpy(response3, "           ");
     }
 
-    ui.SendStatus(response1, response2);
+    ui.SendStatus(response1, response2, response3);
 
 }
 
