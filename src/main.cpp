@@ -129,6 +129,12 @@ void loop()
         
     }
 
+    if (stateChange) {
+        state = ui.ButtonPress();
+        stateChange = false;
+        firstLoop = true;
+    }
+
 }
 
 char* PlantCare() {
@@ -155,7 +161,7 @@ char* PlantCare() {
 
     // *** CONTROL *** //
     if (!watering) { // check if we need to water the plant
-        if (soilMoistureIntegral > soilMoistureThreshold) {
+        if (soilMoistureIntegral > soilMoistureThreshold || soilMoistureIntegral < -soilMoistureThreshold) {
             // signal to raise soil moisture of plant
             unsigned long curr_time = millis();
             // start watering
@@ -163,7 +169,7 @@ char* PlantCare() {
                 startTime = curr_time;
                 fertilizing = true;
                 turn_on_fertilizer_pump();
-            } else if ((curr_time - lastFertilizer > wateringTimeout) && waterTank) { // check if plant needs water
+            } else if ((curr_time - lastWater > wateringTimeout) && waterTank) { // check if plant needs water
                 startTime = curr_time;
                 watering = true;
                 turn_on_water_pump();
@@ -275,10 +281,8 @@ void buttonISR()
             if (buttonState == LOW)
             {
                 // call UI update function
-                state = ui.ButtonPress();
                 stateChange = true;
                 // state = ui.GetState(); // update state based on UI
-                firstLoop = true;
                 #ifdef DEBUG
                 Serial.println("Button Pressed");
                 #endif
