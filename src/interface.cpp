@@ -5,11 +5,10 @@ void Interface::Init() {
     Display.ClearDisplay();
     Display.DisplayOn();
     Display.MoveTo(0, 0);
-    plantNames[0] = " Succulent  ";
-    plantNames[1] = "Leafy Plant ";
-    plantNames[2] = "  Cactus    ";
+    plantNames[0] = "  Cactus    ";
+    plantNames[1] = " Succulent  ";
+    plantNames[2] = "Leafy Plant ";
     plantNames[3] = "  Flowers   ";
-
 }
 
 void Interface::LoadingScreen() {
@@ -74,7 +73,7 @@ void Interface::DrawPlantSelectionScreen() {
     scrollOffset = -1; // set to -1 to force update
     UpdatePlantSelectionScreen();
 
-    Display.DrawImage(push, 20, 20, Display.xsize * 0.2, Display.ysize * 0.1, false);
+    Display.DrawImage(left_arrow, 20, 20, Display.xsize * 0.2, Display.ysize * 0.1, false);
     Display.PlotTextCentered(PSTR("Select"), Display.xsize * 0.3, Display.ysize * 0.1, 1);
     Display.DrawImage(scroll, 15, 15, Display.xsize * 0.7, Display.ysize * 0.1, false);
     Display.PlotTextCentered(PSTR("Scroll"), Display.xsize * 0.8, Display.ysize * 0.1, 1);
@@ -194,11 +193,6 @@ void Interface::UpdatePlantDashboard() {
 
     // Update Light Level
     dtostrf(light_, 4, 3, buffer);
-
-    #ifdef DEBUG
-    Serial.println(buffer);
-    #endif
-    
     Display.PlotTextCentered(buffer, Display.xsize * 0.5, Display.ysize*0.5+6, 2, 5);
     
     // Update Water Tank Indicator
@@ -255,7 +249,7 @@ void Interface::ScrollBackward() {
     }
 }
 
-void Interface::ButtonPress() {
+int Interface::ButtonPress() {
     switch (state) {
         case 0: // loading screen
             state = 1;
@@ -278,6 +272,7 @@ void Interface::ButtonPress() {
             }
             break;
     }
+    return state;
 }
 
 void Interface::SetTank(int tank1, int tank2) {
@@ -307,7 +302,7 @@ int Interface::GetState() {
     return state;
 }
 
-int Interface::SetState(int newState) {
+void Interface::SetState(int newState) {
     state = newState;
 }
 

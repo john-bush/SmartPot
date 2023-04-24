@@ -3,6 +3,7 @@
 #include "util.h"
 #include "tft_display_lib.h"
 #include "interface.h"
+#include <string.h>
 // #include <Adafruit_GFX.h>    // Core graphics library
 // #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 // #include <SPI.h>
@@ -21,6 +22,7 @@ volatile int encoderState = 0;
 volatile int lastEncoderState = 0;
 volatile int buttonState = 0;
 volatile int lastButtonState = 0;
+volatile bool stateChange = false;
 
 // Define variable for and encoder count
 volatile int encoderCount = 0;
@@ -37,6 +39,8 @@ void PollSensors();
 
 void RetrievePastState();
 
+char* PlantCare();
+
 // persistent state variables
 bool configured = false; // true if the user has configured the system
 int state = 0; // general state variable
@@ -50,6 +54,48 @@ float temperature = 0;
 int soilMoisture = 0;
 bool waterTank = false;
 bool fertilizerTank = false;
+
+
+// plant specific variables
+float idealHumidity = 0;
+float idealTemperature = 0;
+int idealLuminosity = 0;
+int idealSoilMoisture = 0;
+
+#define DT 0.001
+// plant care integral variables
+char* response1;
+char* response2;
+float previousHumidity = 0;
+float previousTemperature = 0;
+int previousLuminosity = 0;
+int previousSoilMoisture = 0;
+
+float humidityIntegral = 0;
+float temperatureIntegral = 0;
+int luminosityIntegral = 0;
+int soilMoistureIntegral = 0;
+
+
+// thresholds for plant care
+int soilMoistureThreshold = 40;
+int humidityThreshold = 10;
+int temperatureThreshold = 10;
+int luminosityThreshold = 100;
+
+// timing variables
+unsigned long startTime = 0;
+unsigned long lastWater = 0;
+unsigned long lastFertilizer = 0;
+unsigned long humidityCounter0 = 0;
+unsigned long humidityCounter1 = 0;
+unsigned long temperatureCounter0 = 0;
+unsigned long temperatureCounter1 = 0;
+unsigned long luminosityCounter0 = 0;
+unsigned long luminosityCounter1 = 0;
+unsigned long curr_time = 0;
+
+int plantLight = 0;
 
 
 /**************************************************************************/

@@ -15,11 +15,11 @@ TSL2591 tsl = TSL2591();
 
 void setup(void)
 {
+#ifdef DEBUG
     Serial.begin(9600);
     #ifdef DEBUG
     Serial.println("Initializing");
-    #endif
-
+#endif
     ui.Init();
     // ui.LoadingScreen();
     RetrievePastState();
@@ -27,26 +27,33 @@ void setup(void)
 
 #ifndef DEBUG
     InitEncoder();
+    init_pumps();
     i2c_init(BDIV);
     tsl.initialize();
 #endif
-
+    response1 = new char[20];
+    response2 = new char[20];
 }
 
 
 void loop()
 {
     int entryState = state;
+    stateChange = false;
     switch(state) {
         
         case 0: // Loading Screen
-            if (firstLoop) {
+            if (stateChange) break;
+
+            if (firstLoop ) {
                 ui.LoadingScreen();
                 firstLoop = false;
             }
             break;
         
         case 1: // Tank Screen
+            if (stateChange) break;
+            
             if (firstLoop) {
                 ui.DrawTankScreen();
                 firstLoop = false;
@@ -55,13 +62,22 @@ void loop()
             PollSensors();
             ui.SetTank(waterTank, fertilizerTank);
             if (waterTank && fertilizerTank) {
+                // prime water pumps
+                turn_on_water_pump();
+                turn_on_fertilizer_pump();
+                delay(2000);
+                turn_off_water_pump();
+                turn_off_fertilizer_pump();
                 state = 2;
                 firstLoop = true;
                 ui.SetState(state);
+                delay(2000);
             }
                 
             break;
         case 2: // Plant Selection Screen
+            if (stateChange) break;
+
             if (firstLoop) {
                 ui.DrawPlantSelectionScreen();
                 firstLoop = false;
@@ -69,19 +85,29 @@ void loop()
             // *updates and state change are handled by the button press and scroll interrupts          
             break;
         case 3: // Plant Confirmation Screen
+            if (stateChange) break;
+
             if (firstLoop) {
                 ui.DrawPlantConfirmationScreen();
                 firstLoop = false;
             }
             break;
         case 4: // Plant Dashboard
+            if (stateChange) break;
+
             if (firstLoop) {
                 readIntFromEEPROM(8, plantType); // get plant type from EEPROM
                 ui.DrawPlantDashboard();
                 firstLoop = false;
+
+                idealHumidity = 40 + 2 * plantType;
+                idealLuminosity = 1000 - 100 * plantType;
+                idealSoilMoisture = 550 - 30 * plantType;
+                idealTemperature = 25 - plantType;
             }
             PollSensors();
             // send sensor data to Interface object
+            // PlantCare();
             ui.UpdateSensors(temperature, humidity, luminosity, waterTank, fertilizerTank);
             ui.UpdatePlantDashboard();
             break;
@@ -95,6 +121,47 @@ void loop()
         writeIntIntoEEPROM(4, state);
         
     }
+
+}
+
+char* PlantCare() {
+    // *** CALCULATIONS *** //
+    // temperature integral
+    float adjustedTemperature = temperature - idealTemperature;
+    temperatureIntegral += (adjustedTemperature - previousHumidity) * DT * 0.5;
+    previousTemperature = adjustedTemperature;
+    
+    // humidity integral
+    float adjustedHumidity = humidity - idealHumidity;
+    humidityIntegral += (adjustedHumidity - previousHumidity) * DT * 0.5;
+    previousHumidity = adjustedHumidity;
+    
+    // luminosity integral
+    int adjustedLuminosity = luminosity - idealLuminosity;
+    luminosityIntegral += (adjustedLuminosity - previousLuminosity) * DT * 0.5;
+    previousLuminosity = adjustedLuminosity;
+
+    // soil moisture integral
+    int adjustedSoilMoisture = soilMoisture - idealSoilMoisture;
+    soilMoistureIntegral += (adjustedSoilMoisture - previousSoilMoisture) * DT * 0.5;
+    previousSoilMoisture = adjustedSoilMoisture;
+
+    // *** CONTROL *** //
+    if (soilMoistureIntegral > soilMoistureThreshold || soilMoistureIntegral < -soilMoistureThreshold) {
+        // signal to raise soil moisture of plant
+    }
+    
+    if (luminosityIntegral > luminosityThreshold || luminosityIntegral < -luminosityThreshold) {
+        // signal to raise luminosity of plant
+        strcpy(response1, "your plant needs");
+        strcpy(response2, "more light");
+    } else if (temperatureIntegral > temperatureThreshold || temperatureIntegral < -temperatureThreshold) {
+        // signal to raise temperature of plant
+        strcpy(response1, "temperature");
+    } else if (humidityIntegral > humidityThreshold || humidityIntegral < -humidityThreshold) {
+        strcpy(response1, "humidity");
+    }
+
 }
 
 void encoderISR()
@@ -133,6 +200,7 @@ void encoderISR()
             }
         }
         #ifdef DEBUG
+        #ifdef DEBUG
         Serial.print("Encoder count: ");
         Serial.println(encoderCount);
         #endif
@@ -153,12 +221,10 @@ void buttonISR()
             if (buttonState == LOW)
             {
                 // call UI update function
-                ui.ButtonPress();
-                int oldState = state;
-                state = ui.GetState(); // update state based on UI
-                if (oldState != state) {
-                    firstLoop = true;
-                }
+                state = ui.ButtonPress();
+                stateChange = true;
+                // state = ui.GetState(); // update state based on UI
+                firstLoop = true;
                 #ifdef DEBUG
                 Serial.println("Button Pressed");
                 #endif
@@ -204,11 +270,11 @@ void PollSensors()
     read_soil_moisture(soilMoisture);
     read_tank_levels(waterTank, fertilizerTank);
 
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.printf("Luminosity: %d \n", luminosity);
     Serial.printf("Humidity: %d \n", humidity);
     Serial.printf("Temperature: %d \n", temperature);
-    #endif
+#endif
 }
 
 
@@ -216,6 +282,9 @@ void RetrievePastState()
 {
     readBoolFromEEPROM(0, configured);
     readIntFromEEPROM(4, state);
+    if (state < 0 || state > 4) {
+        state = 0;
+    }
     if (configured) {
         readIntFromEEPROM(8, plantType);
         ui.SetPlantType(plantType);

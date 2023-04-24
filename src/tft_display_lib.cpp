@@ -141,9 +141,6 @@ void TFTDisplay::DrawImage(const uint16_t *image, int w, int h, int centerX, int
   int imageOriginX = centerX - (scale * w) / 2;
   int imageOriginY = centerY + (scale * h) / 2;
   int fore_copy = fore;
-  if (mirror){
-    Serial.println("Mirrored Image");
-  }
   for (int y = 0; y < h; y++)
   {
     for (int x = 0; x < w; x++)

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <EEPROM.h>
 
 void writeIntIntoEEPROM(int address, int number);

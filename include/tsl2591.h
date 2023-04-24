@@ -25,6 +25,7 @@
   #define TSL2591_LUX_DF 408.0   ///< Lux cooefficient
 
   #define TSL2591_GAIN_LOW 0x00;
+  #define TSL2591_GAIN_MED 0x10;
   #define TSL2591_INTEGRATIONTIME_100MS 0x00
 
 

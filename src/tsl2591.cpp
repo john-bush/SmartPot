@@ -44,13 +44,12 @@ uint8_t TSL2591::set_timing_and_gain(){
     uint8_t reg_data[1];
 
     reg_addr[0] = TSL2591_COMMAND_BIT | TSL2591_REGISTER_CONTROL;
-    reg_data[0] = TSL2591_INTEGRATIONTIME_100MS | TSL2591_GAIN_LOW;
+    reg_data[0] = TSL2591_INTEGRATIONTIME_100MS | TSL2591_GAIN_MED;
     int res = i2c_io(LIGHT_SENSOR_ADDR, reg_addr, 1, reg_data , 1, nullptr, 0);
     return res;
 }
 
 long TSL2591::rd_luminosity(){
-    uint32_t result;
     uint8_t reg_addr[1];
 
     enable();

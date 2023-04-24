@@ -31,14 +31,14 @@ class Interface : public TFTDisplay
 
         void ScrollForward();
         void ScrollBackward();
-        void ButtonPress();
+        int ButtonPress(); // returns current state
 
         void UpdateSensors(float temperature, float humidity, float light, int tankLevel1, int tankLevel2);
 
         void SetTank(int tank1, int tank2);
 
         int GetState();
-        int SetState(int newState);
+        void SetState(int newState);
         void SetPlantType(int plantType);
     
     private:
