@@ -54,10 +54,17 @@ class TFTDisplay {
         void MoveTo (int x, int y);
         void PlotPoint (int x, int y);
 
+        /**
+         * Functions that do not include a position argument will draw relative to the current position
+        */
+
         // draws an image with width w and height h defined by color map *image centered at position x,y
         void DrawImage(const uint16_t *image, int w, int h, int centerX, int centerY, bool mirror, int scale = 1);
+        // Draws line from current position to x,y
         void DrawTo (int x, int y);
+        // Draws a line between two points
         void DrawTo (int x1, int y1, int x2, int y2);
+        // Fills a Rectangle with current foreground color, with bottom left corner at current position
         void FillRect (int w, int h);
         void FillRect (int w, int h, int x, int y);
         void FillCenteredRect(int w, int h, int centerX, int centerY);
@@ -80,9 +87,6 @@ class TFTDisplay {
         void PlotTextCentered(const char* str, int centerX, int centerY, int scale_, int color);
         void PlotTextLeftAligned(PGM_P p, int x, int y, int scale_, bool background = true);
         void PlotInt(int n);
-        void TestChart ();
-        void BarChart ();
-        void Waterfall ();
 
         // Adafruit 1.47" 320x172 rounded rectangle display
         int const xsize = 320, ysize = 172, xoff = 0, yoff = 34, invert = 1, rotate = 0, bgr = 0;
