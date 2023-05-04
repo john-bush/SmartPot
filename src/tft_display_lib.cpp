@@ -462,6 +462,13 @@ void TFTDisplay::PlotTextCentered(PGM_P p, int centerX, int centerY, int scale_,
   PlotText(p, scale_, background);
 }
 
+/// @brief Function to be used with parameter or non const char strings
+              // Plots text p on screen centered at x,y
+/// @param str String to plot
+/// @param centerX horizontal center of the text
+/// @param centerY vertical center of the text
+/// @param scale_ Scale of text (scale 1 means each character is 6x8 pixels)
+/// @param numChar number of characters to plot
 void TFTDisplay::PlotTextCentered(const char* str, int centerX, int centerY, int scale_, int numChar)
 {
   int len = 0;
@@ -478,6 +485,12 @@ void TFTDisplay::PlotTextCentered(const char* str, int centerX, int centerY, int
   }
 }
 
+/// @brief Plots text p on screen with bottom left corner at x,y
+/// @param p const char string to plot
+/// @param x Plots text with bottom left corner at x,y
+/// @param y Plots text with bottom left corner at x,y
+/// @param scale_ Scale of text (scale 1 means each character is 6x8 pixels)
+/// @param background whether to plot the background color
 void TFTDisplay::PlotTextLeftAligned(PGM_P p, int x, int y, int scale_, bool background = true)
 {
   xpos = x;
@@ -498,129 +511,3 @@ void TFTDisplay::PlotInt(int n)
     }
   }
 }
-
-void TFTDisplay::TestChart()
-{
-  DrawRect(xsize, ysize);
-  scale = 8;
-  fore = Color(255, 0, 0);
-  MoveTo((xsize - 40) / 2, (ysize - 64) / 2);
-  PlotChar('F');
-  scale = 1;
-}
-
-// Demos **********************************************
-
-void TFTDisplay::BarChart()
-{
-  int x0 = 0, y0 = 0, w = xsize, h = ysize, x1 = 15, y1 = 11;
-  MoveTo(x0 + (w - x1 - 90) / 2 + x1, y0 + h - 8);
-  PlotText(PSTR("Sensor Readings"));
-  // Horizontal axis
-  int xinc = (w - x1) / 20;
-  MoveTo(x0 + x1, y0 + y1);
-  DrawTo(x0 + w - 1, y0 + y1);
-  for (int i = 0; i <= 20; i = i + 4)
-  {
-    int mark = x1 + i * xinc;
-    MoveTo(x0 + mark, y0 + y1);
-    DrawTo(x0 + mark, y0 + y1 - 2);
-    // Draw histogram
-    if (i != 20)
-    {
-      int bar = xinc * 4 / 3;
-      for (int b = 2; b >= 0; b--)
-      {
-        fore = Color(255, 127 * b, 0); // Red, Orange, Yellow
-        MoveTo(x0 + mark + bar * b - b + 1, y0 + y1 + 1);
-        FillRect(bar, 5 + random(h - y1 - 20));
-      }
-      fore = White;
-    }
-    if (i > 9)
-      MoveTo(x0 + mark - 7, y0 + y1 - 11);
-    else
-      MoveTo(x0 + mark - 3, y0 + y1 - 11);
-    PlotInt(i);
-  }
-  // Vertical axis
-  int yinc = (h - y1) / 20;
-  MoveTo(x0 + x1, y0 + y1);
-  DrawTo(x0 + x1, y0 + h - 1);
-  for (int i = 0; i <= 20; i = i + 5)
-  {
-    int mark = y1 + i * yinc;
-    MoveTo(x0 + x1, y0 + mark);
-    DrawTo(x0 + x1 - 2, y0 + mark);
-    if (i > 9)
-      MoveTo(x0 + x1 - 15, y0 + mark - 4);
-    else
-      MoveTo(x0 + x1 - 9, y0 + mark - 4);
-    PlotInt(i);
-  }
-}
-
-void TFTDisplay::Waterfall()
-{
-  int x0 = 0, y0 = 0, w = xsize, h = ysize, x1 = 15, y1 = 11;
-  int factor = 5160 / h * 10;
-  MoveTo(x0 + (w - x1 - 60) / 2 + x1, y0 + h - 8);
-  PlotText(PSTR("Luminance"));
-  // Horizontal axis
-  int xinc = (w - x1 - 15) / 30;
-  MoveTo(x0 + x1, y0 + y1);
-  DrawTo(x0 + x1 + xinc * 20, y0 + y1);
-  for (int i = 0; i <= 20; i = i + 5)
-  {
-    int mark = x1 + i * xinc;
-    MoveTo(x0 + mark, y0 + y1);
-    DrawTo(x0 + mark, y0 + y1 - 2);
-    if (i > 9)
-      MoveTo(x0 + mark - 7, y0 + y1 - 11);
-    else
-      MoveTo(x0 + mark - 3, y0 + y1 - 11);
-    PlotInt(i);
-  }
-  // Vertical axis
-  int yinc = (h - y1) / 20;
-  MoveTo(x0 + x1, y0 + y1);
-  DrawTo(x0 + x1, y0 + h - 1);
-  for (int i = 0; i <= 20; i = i + 5)
-  {
-    int mark = y1 + i * yinc;
-    MoveTo(x0 + x1, y0 + mark);
-    DrawTo(x0 + x1 - 2, y0 + mark);
-    if (i > 9)
-      MoveTo(x0 + x1 - 15, y0 + mark - 4);
-    else
-      MoveTo(x0 + x1 - 9, y0 + mark - 4);
-    PlotInt(i);
-  }
-  // Diagonal axis
-  yinc = xinc / 2;
-  // MoveTo(x0+x1, y0+y1); DrawTo(x0+x1+10*xinc, y0+y1+10*xinc);
-  MoveTo(x0 + x1 + 20 * xinc, y0 + y1);
-  DrawTo(x0 + x1 + 30 * xinc, y0 + y1 + 10 * xinc);
-  for (int i = 0; i <= 20; i = i + 5)
-  {
-    MoveTo(x0 + x1 + 20 * xinc + i * xinc / 2, y0 + y1 + i * xinc / 2);
-    DrawTo(x0 + x1 + 20 * xinc + i * xinc / 2 + 3, y0 + y1 + i * xinc / 2);
-    MoveTo(x0 + x1 + 20 * xinc + i * xinc / 2 + 6, y0 + y1 + i * xinc / 2 - 4);
-    PlotInt(i);
-  }
-  // Plot data
-  for (int y = 20; y >= 0; y--)
-  {
-    for (int i = 0; i <= 20; i++)
-    {
-      int fn0 = 180 - (i - 10) * (i - 10) - (y - 10) * (y - 10);
-      int fn1 = 180 - (i + 1 - 10) * (i + 1 - 10) - (y - 10) * (y - 10);
-      fore = Color(255, 255, 0);
-      MoveTo(x0 + x1 + y * yinc + i * xinc, y0 + y1 + y * yinc + fn0 * fn0 / factor);
-      DrawTo(x0 + x1 + y * yinc + (i + 1) * xinc, y0 + y1 + y * yinc + fn1 * fn1 / factor);
-      fore = White;
-    }
-  }
-}
-
-
